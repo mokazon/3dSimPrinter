@@ -1,0 +1,13 @@
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\obj\Debug\Firmware.csprojResolveAssemblyReference.cache
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\obj\Debug\Firmware.csproj.CoreCompileInputs.cache
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\bin\Debug\Firmware.dll
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\bin\Debug\Firmware.pdb
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\bin\Debug\Hardware.dll
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\obj\Debug\Firmware.dll
+C:\dant\CPTR309\3DPrinterSimulator\3DSim - Student version\Firmware\obj\Debug\Firmware.pdb
+C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\Firmware\bin\Debug\Firmware.dll
+C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\Firmware\bin\Debug\Firmware.pdb
+C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\Firmware\bin\Debug\Hardware.dll
+C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\Firmware\obj\Debug\Firmware.csprojResolveAssemblyReference.cache
+C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\Firmware\obj\Debug\Firmware.dll
+C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\Firmware\obj\Debug\Firmware.pdb
