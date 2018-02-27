@@ -21,3 +21,4 @@ C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3D
 C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\3DPrinterSim\bin\Debug\Firmware.pdb
 C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\3DPrinterSim\bin\Debug\OpenTK.xml
 C:\Users\Matthew\OneDrive\Documents\CPTR309\Lab 3\3DSim - Student version (1)\3DSim - Student version\3DPrinterSim\obj\Debug\3DPrinterSim.csprojResolveAssemblyReference.cache
+C:\Users\john.boggess\Documents\Classes\Winter 2018\Software Engineering\3DSim\3dSimPrinter\3DSim - Student version\3DPrinterSim\bin\Debug\3DPrinterSim.exe.config
