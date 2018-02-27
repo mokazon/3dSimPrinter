@@ -13,7 +13,6 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Hardware;
 using Firmware;
-
 namespace PrinterSimulator
 {
     class PrintSim
@@ -48,7 +47,6 @@ namespace PrinterSimulator
 
         static void Main()
         {
-
             IntPtr ptr = GetConsoleWindow();
             MoveWindow(ptr, 0, 0, 1000, 400, true);
 
