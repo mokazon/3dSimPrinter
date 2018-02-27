@@ -46,5 +46,33 @@ namespace Firmware
             while (!fInitialized)
                 Thread.Sleep(100);
         }
+
+        public void ResetZRail()
+        {
+            while (!printer.LimitSwitchPressed())
+            {
+                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+            }
+            for (int i = 0; i < 39800; i++)
+            {
+                printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
+            }
+        }
+
+        public RaiseZRail(int increments)
+        {
+            for (int i = 0; i < increments; i++)
+            {
+                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+            }
+        }
+
+        public LowerZRail(int increments)
+        {
+            for (int i = 0; i < increments; i++)
+            {
+                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+            }
+        }
     }
 }
