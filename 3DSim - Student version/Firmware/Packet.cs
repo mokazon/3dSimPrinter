@@ -16,6 +16,7 @@ namespace Firmware
             this.Command = Command;
             this.Data = Data;
             Length = (uint)Data.Length;
+            CalculateChecksum();
         }
 
         public byte[] GetHeaderBytes()
