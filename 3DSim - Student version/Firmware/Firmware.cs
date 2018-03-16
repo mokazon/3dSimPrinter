@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Hardware;
-
 namespace Firmware
 {
 
@@ -26,6 +25,27 @@ namespace Firmware
             // Todo - receive incoming commands from the serial link and act on those commands by calling the low-level hardwarwe APIs, etc.
             while (!fDone)
             {
+                byte[] header = CommunicationProtocol.Read(printer, 4);
+                byte length = header[1];
+                printer.WriteSerialToHost(header, header.Length);
+                byte[] ack = CommunicationProtocol.Read(printer, 1);
+                if (ack[0] == 0xA5)
+                {
+                    byte[] data = CommunicationProtocol.Read(printer, length);
+                    Packet p = new Packet(header[0], data);
+                    p.CalculateChecksum();
+                    if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
+                    {
+                        //Process Command
+                        byte[] result = Encoding.ASCII.GetBytes("SUCCESS");
+                        printer.WriteSerialToHost(result, result.Length);
+                    }
+                    else
+                    {
+                        byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
+                        printer.WriteSerialToHost(result, result.Length);
+                    }
+                }
             }
         }
 

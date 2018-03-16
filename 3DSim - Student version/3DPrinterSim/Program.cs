@@ -64,6 +64,9 @@ namespace PrinterSimulator
 
             SetForegroundWindow(ptr);
 
+            CommunicationProtocol cp = new CommunicationProtocol();
+            bool b = cp.SendPacket(printer.GetPrinterSim(), new Packet(0, new byte[] { 0 }));
+
             bool fDone = false;
             while (!fDone)
             {
