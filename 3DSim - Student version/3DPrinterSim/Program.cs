@@ -15,6 +15,52 @@ using Hardware;
 using Firmware;
 namespace PrinterSimulator
 {
+    class GCODECommand
+    {
+        public GCODECommand(string cmd)
+        {
+            if (cmd.Length > 0)
+            {
+                char[] delimiters = { ' ' };
+                string[] commandElements = cmd.Split(delimiters);
+                if (commandElements[0].Equals("G1"))
+                {
+                    for (int i = 1; i < commandElements.Length; i++)
+                    {
+                        string element = commandElements[i].ToUpper();
+                        string valueString = element.Substring(1, element.Length - 1);
+                        float value = float.Parse(valueString, System.Globalization.CultureInfo.InvariantCulture);
+
+                        if (element[0] == 'X')
+                        {
+                            this.x = value;
+                        }
+                        else if (element[0] == 'Y')
+                        {
+                            this.y = value;
+                        }
+                        else if (element[0] == 'Z')
+                        {
+                            this.z = value;
+                        }
+                        else if (element[0] == 'E')
+                        {
+                            if (value != 0)
+                            {
+                                this.laser = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public float x = 0;
+        public float y = 0;
+        public float z = 0;
+        public bool laser = false;
+    }
+
     class PrintSim
     {
         static void PrintFile(PrinterControl simCtl)
@@ -24,7 +70,15 @@ namespace PrinterSimulator
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
-            // Todo - Read GCODE file and send data to firmware for printing
+            string line = file.ReadLine();
+            while (line != null)
+            {
+                GCODECommand command = new GCODECommand(line);
+
+                // SEND COMMAND TO FIRMWARE
+
+                line = file.ReadLine();
+            }
 
             swTimer.Stop();
             long elapsedMS = swTimer.ElapsedMilliseconds;
