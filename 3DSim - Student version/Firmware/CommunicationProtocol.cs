@@ -57,4 +57,14 @@ namespace Firmware
             return new byte[0];
         }
     }
+
+    public enum Command
+    {
+        Laser = 0,
+        ResetBuildPlatform = 1,
+        RaiseBuildPlatform = 2,
+        ToTop = 3,
+        AimLaser = 4,
+        GetFirmwareVersion = 5
+    }
 }

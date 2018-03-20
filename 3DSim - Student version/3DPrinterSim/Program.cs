@@ -64,6 +64,7 @@ namespace PrinterSimulator
 
             SetForegroundWindow(ptr);
 
+            //ToDo : Test Code, Remove me
             CommunicationProtocol cp = new CommunicationProtocol();
             bool b = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), new Packet(0, new byte[] { 0 }));
             while(!b)

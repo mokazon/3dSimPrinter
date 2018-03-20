@@ -11,6 +11,7 @@ namespace Firmware
     public class FirmwareController
     {
         PrinterControl printer;
+        string VersionNumber = "1";
         bool fDone = false;
         bool fInitialized = false;
 
@@ -41,7 +42,7 @@ namespace Firmware
                     Packet p = new Packet(header[0], data);
                     if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
                     {
-                        //Process Command
+                        ProcessCommand(header[0], data);
                         byte[] result = Encoding.ASCII.GetBytes("SUCCESS");
                         printer.WriteSerialToHost(result, result.Length);
                     }
@@ -51,6 +52,14 @@ namespace Firmware
                         printer.WriteSerialToHost(result, result.Length);
                     }
                 }
+            }
+        }
+
+        public void ProcessCommand(byte CmdByte, byte[] Data)
+        {
+            if(CmdByte == (byte)Command.GetFirmwareVersion)
+            {
+                printer.WriteSerialToHost(Encoding.ASCII.GetBytes(VersionNumber), Encoding.ASCII.GetBytes(VersionNumber).Length);
             }
         }
 
