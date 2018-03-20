@@ -11,6 +11,7 @@ namespace Firmware
     public class FirmwareController
     {
         PrinterControl printer;
+        int VersionNumber = 1;
         bool fDone = false;
         bool fInitialized = false;
 
@@ -26,12 +27,12 @@ namespace Firmware
             while (!fDone)
             {
                 byte[] header = CommunicationProtocol.ReadBlocking(printer, 4);
-                byte length = header[1];
+                byte dataLength = header[1];
                 printer.WriteSerialToHost(header, header.Length);
                 byte[] ack = CommunicationProtocol.ReadBlocking(printer, 1);
                 if (ack[0] == 0xA5)
                 {
-                    byte[] data = CommunicationProtocol.Read(printer, length);
+                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,1000);
                     if(data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
@@ -41,7 +42,7 @@ namespace Firmware
                     Packet p = new Packet(header[0], data);
                     if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
                     {
-                        //Process Command
+                        ProcessCommand(header[0], data);
                         byte[] result = Encoding.ASCII.GetBytes("SUCCESS");
                         printer.WriteSerialToHost(result, result.Length);
                     }
@@ -51,6 +52,14 @@ namespace Firmware
                         printer.WriteSerialToHost(result, result.Length);
                     }
                 }
+            }
+        }
+
+        public void ProcessCommand(byte CmdByte, byte[] Data)
+        {
+            if(CmdByte == (byte)Command.GetFirmwareVersion)
+            {
+                printer.WriteSerialToHost(BitConverter.GetBytes(VersionNumber), BitConverter.GetBytes(VersionNumber).Length);
             }
         }
 
