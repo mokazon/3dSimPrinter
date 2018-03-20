@@ -26,12 +26,12 @@ namespace Firmware
             while (!fDone)
             {
                 byte[] header = CommunicationProtocol.ReadBlocking(printer, 4);
-                byte length = header[1];
+                byte dataLength = header[1];
                 printer.WriteSerialToHost(header, header.Length);
                 byte[] ack = CommunicationProtocol.ReadBlocking(printer, 1);
                 if (ack[0] == 0xA5)
                 {
-                    byte[] data = CommunicationProtocol.Read(printer, length);
+                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,1000);
                     if(data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");

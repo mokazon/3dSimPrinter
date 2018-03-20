@@ -66,6 +66,10 @@ namespace PrinterSimulator
 
             CommunicationProtocol cp = new CommunicationProtocol();
             bool b = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), new Packet(0, new byte[] { 0 }));
+            while(!b)
+            {
+                b = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), new Packet(0, new byte[] { 0 }));
+            }
 
             bool fDone = false;
             while (!fDone)

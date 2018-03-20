@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Hardware;
+using System.Timers;
 namespace PrinterSimulator
 {
     class CommunicationProtocol
@@ -33,6 +34,25 @@ namespace PrinterSimulator
         }
 
 
+        /// <summary>
+        /// Read data from firmware. Blocks the thread until the expected bytes are received.
+        /// </summary>
+        /// <param name="pc"></param>
+        /// <param name="expectedBytes">The number of bytes expected</param>
+        /// <returns></returns>
+        public static byte[] ReadBlocking(Hardware.PrinterControl pc, int expectedBytes)
+        {
+            byte[] data = new byte[expectedBytes];
+            while (pc.ReadSerialFromFirmware(data, expectedBytes) == 0) { }
+            return data;
+        }
+
+        /// <summary>
+        /// Read data from firmware. Returns a byte array of length 0 if no data can be read.
+        /// </summary>
+        /// <param name="pc"></param>
+        /// <param name="expectedBytes">The number of bytes expected</param>
+        /// <returns></returns>
         public static byte[] Read(Hardware.PrinterControl pc, int expectedBytes)
         {
             byte[] data = new byte[expectedBytes];
@@ -40,11 +60,29 @@ namespace PrinterSimulator
             return data;
         }
 
-        static public byte[] ReadBlocking(PrinterControl pc, int expectedBytes)
+        /// <summary>
+        /// Attempts to read the given number of bytes from the firmware for the given amount of time. Returns a byte array of length 0 if no data was read.
+        /// </summary>
+        /// <param name="pc"></param>
+        /// <param name="expectedBytes">The number of bytes expected</param>
+        /// <param name="milliseconds">Time to wait in miliseconds</param>
+        /// <returns></returns>
+        public static byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
         {
             byte[] data = new byte[expectedBytes];
-            while (pc.ReadSerialFromFirmware(data, expectedBytes) == 0) { }
-            return data;
+            Timer timer = new Timer(milliseconds);
+            timer.AutoReset = false;
+            timer.Start();
+            while (timer.Enabled)
+            {
+                pc.ReadSerialFromFirmware(data, expectedBytes);
+                if (data.Length == expectedBytes)
+                {
+                    timer.Stop();
+                    return data;
+                }
+            }
+            return new byte[0];
         }
     }
 }
