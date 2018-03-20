@@ -64,18 +64,20 @@ namespace PrinterSimulator
 
             SetForegroundWindow(ptr);
 
-            //ToDo : Test Code, Remove me
-            CommunicationProtocol cp = new CommunicationProtocol();
-            bool b = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), new Packet(0, new byte[] { 0 }));
-            while(!b)
+            //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
+            Packet p = new Packet(5, new byte[1]);
+            string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
+            while(!response.Contains("VERSION"))
             {
-                b = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), new Packet(0, new byte[] { 0 }));
+                response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
             }
+            string versionNum = response.Split(' ')[1];
 
             bool fDone = false;
             while (!fDone)
             {
                 Console.Clear();
+                Console.WriteLine("Firmware Version: " + versionNum);
                 Console.WriteLine("3D Printer Simulation - Control Menu\n");
                 Console.WriteLine("P - Print");
                 Console.WriteLine("T - Test");

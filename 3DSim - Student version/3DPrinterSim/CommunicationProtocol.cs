@@ -7,7 +7,7 @@ namespace PrinterSimulator
 {
     class CommunicationProtocol
     {
-        static public bool SendPacket(PrinterControl pc, Packet pkt)
+        static public string SendPacket(PrinterControl pc, Packet pkt)
         {
             byte[] header = pkt.GetHeaderBytes();
             pc.WriteSerialToFirmware(header,header.Length);
@@ -26,14 +26,13 @@ namespace PrinterSimulator
                     if(partialResponse.Length == 0) { break; }
                 }
                 string result = ASCIIEncoding.ASCII.GetString(response.ToArray());
-                if(result == "SUCCESS") { return true; }
-                return false;
+                return result;
+                //if(result == "SUCCESS" || result.Contains("VERSION")) { return true; }
+                //return false;
             }
             pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
-            return false;
+            return "Invalid Header";
         }
-
-
         /// <summary>
         /// Read data from firmware. Blocks the thread until the expected bytes are received.
         /// </summary>
