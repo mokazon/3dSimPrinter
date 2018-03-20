@@ -11,7 +11,7 @@ namespace Firmware
     public class FirmwareController
     {
         PrinterControl printer;
-        string VersionNumber = "1";
+        int VersionNumber = 1;
         bool fDone = false;
         bool fInitialized = false;
 
@@ -59,7 +59,7 @@ namespace Firmware
         {
             if(CmdByte == (byte)Command.GetFirmwareVersion)
             {
-                printer.WriteSerialToHost(Encoding.ASCII.GetBytes(VersionNumber), Encoding.ASCII.GetBytes(VersionNumber).Length);
+                printer.WriteSerialToHost(BitConverter.GetBytes(VersionNumber), BitConverter.GetBytes(VersionNumber).Length);
             }
         }
 
