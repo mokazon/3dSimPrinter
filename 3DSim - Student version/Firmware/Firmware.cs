@@ -93,20 +93,30 @@ namespace Firmware
             }
         }
 
-        public void RaiseZRail(int increments)
+        public void RaiseZRail()
         {
-            for (int i = 0; i < increments; i++)
+            for (int i = 0; i < 200; i++)
             {
                 printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
             }
         }
 
-        public void LowerZRail(int increments)
+        public void ZRailToTop()
         {
-            for (int i = 0; i < increments; i++)
+            while(!printer.LimitSwitchPressed())
             {
                 printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
             }
+        }
+
+        public void PointLaser(float x, float y)
+        {
+            printer.MoveGalvos(x, y);
+        }
+
+        public void SetLaser(bool laserOn)
+        {
+            printer.SetLaser(laserOn);
         }
     }
 }
