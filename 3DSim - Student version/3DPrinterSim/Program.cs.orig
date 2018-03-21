@@ -117,21 +117,33 @@ namespace PrinterSimulator
             firmware.WaitForInit();
 
             SetForegroundWindow(ptr);
-            //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
+<<<<<<< HEAD
+
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             Packet p = new Packet(5, new byte[1]);
             string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-            while (!response.Contains("VERSION"))
+            while(!response.Contains("VERSION"))
             {
                 response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
             }
             string versionNum = response.Split(' ')[1];
+=======
+            //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
+            Packet p = new Packet(5, new byte[0]);
+            CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
+            byte[] versionByte =  CommunicationProtocol.ReadWait(printer.GetPrinterSim(), 4, 1000);
+            int versionNum = BitConverter.ToInt32(versionByte, 0);
+>>>>>>> c88f7d5864536124eb5b2bd5244f574764dd45c1
 
             bool fDone = false;
             while (!fDone)
             {
                 Console.Clear();
+<<<<<<< HEAD
                 Console.WriteLine("Firmware Version: " + versionNum);
+=======
+                Console.WriteLine("Firmware Version: " + versionNum); //This is where the version number should be.
+>>>>>>> c88f7d5864536124eb5b2bd5244f574764dd45c1
                 Console.WriteLine("3D Printer Simulation - Control Menu\n");
                 Console.WriteLine("P - Print");
                 Console.WriteLine("T - Test");
