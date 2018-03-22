@@ -43,6 +43,7 @@ namespace Firmware
                     if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
                     {
                         byte[] result = ProcessCommand(header[0], data);
+
                         printer.WriteSerialToHost(result, result.Length);
                     }
                     else
@@ -56,7 +57,27 @@ namespace Firmware
 
         public byte[] ProcessCommand(byte CmdByte, byte[] Data)
         {
-            if(CmdByte == (byte)Command.GetFirmwareVersion)
+            if(CmdByte == (byte) CommunicationCommand.Laser)
+            {
+                SetLaser(BitConverter.ToBoolean(Data, 0));
+            }
+            else if(CmdByte == (byte) CommunicationCommand.ResetBuildPlatform)
+            {
+                ResetZRail();
+            }
+            else if(CmdByte == (byte)CommunicationCommand.RaiseBuildPlatform)
+            {
+                RaiseZRail();
+            }
+            else if(CmdByte == (byte)CommunicationCommand.ToTop)
+            {
+                ZRailToTop();
+            }
+            else if(CmdByte == (byte)CommunicationCommand.AimLaser)
+            {
+                PointLaser(BitConverter.ToSingle(Data, 0), BitConverter.ToSingle(Data, 4));
+            }
+            else if(CmdByte == (byte)CommunicationCommand.GetFirmwareVersion)
             {
                 return Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
             }

@@ -47,5 +47,37 @@ namespace PrinterSimulator
             }
             Checksum = sum;
         }
+
+        public static Packet LaserOnOffCommand(bool onOff)
+        {
+            return new Packet((byte)CommunicationCommand.Laser, BitConverter.GetBytes(onOff));
+        }
+
+        public static Packet ResetBuildPlatformCommand()
+        {
+            return new Packet((byte)CommunicationCommand.ResetBuildPlatform, new byte[0]);
+        }
+
+        public static Packet RaiseBuildPlatformCommand()
+        {
+            return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, new byte[0]);
+        }
+
+        public static Packet ToTopCommand()
+        {
+            return new Packet((byte)CommunicationCommand.ToTop, new byte[0]);
+        }
+
+        public static Packet AimLaserCommand(float x, float y)
+        {
+            byte[] xData = BitConverter.GetBytes(x);
+            byte[] yData = BitConverter.GetBytes(y);
+            return new Packet((byte)CommunicationCommand.AimLaser, xData.Concat(yData).ToArray());
+        }
+
+        public static Packet GetFirmwareVersionCommand()
+        {
+            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[0]);
+        }
     }
 }

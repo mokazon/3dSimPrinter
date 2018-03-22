@@ -58,7 +58,7 @@ namespace Firmware
         }
     }
 
-    public enum Command
+    public enum CommunicationCommand
     {
         Laser = 0,
         ResetBuildPlatform = 1,

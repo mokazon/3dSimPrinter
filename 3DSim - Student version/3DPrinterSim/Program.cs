@@ -119,13 +119,16 @@ namespace PrinterSimulator
             SetForegroundWindow(ptr);
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
-            Packet p = new Packet(5, new byte[1]);
+            Packet p = new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
             string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
             while (!response.Contains("VERSION"))
             {
                 response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
             }
             string versionNum = response.Split(' ')[1];
+
+            #region Testing Firmware Processing Commands
+            #endregion
 
             bool fDone = false;
             while (!fDone)
@@ -155,6 +158,11 @@ namespace PrinterSimulator
                 }
 
             }
+
+        }
+
+        public void Tests()
+        {
 
         }
     }

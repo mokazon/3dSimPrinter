@@ -84,4 +84,14 @@ namespace PrinterSimulator
             return new byte[0];
         }
     }
+
+    public enum CommunicationCommand
+    {
+        Laser = 0,
+        ResetBuildPlatform = 1,
+        RaiseBuildPlatform = 2,
+        ToTop = 3,
+        AimLaser = 4,
+        GetFirmwareVersion = 5
+    }
 }
