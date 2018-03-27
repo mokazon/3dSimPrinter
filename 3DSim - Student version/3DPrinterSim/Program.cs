@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Hardware;
 using Firmware;
+using System.Windows.Forms;
 namespace PrinterSimulator
 {
     class GCODECommand
@@ -63,9 +64,10 @@ namespace PrinterSimulator
 
     class PrintSim
     {
-        static void PrintFile(PrinterControl simCtl)
+
+        static void PrintFile(PrinterControl simCtl, string fileName)
         {
-            System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\SampleSTLs\\F-35_Corrected.gcode");
+            System.IO.StreamReader file = new System.IO.StreamReader(fileName);
 
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
@@ -99,6 +101,14 @@ namespace PrinterSimulator
         [DllImport("user32.dll", SetLastError = true)]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        static string getFile()
+        {
+            OpenFileDialog fd = new OpenFileDialog();
+            fd.ShowDialog();
+            return fd.FileName;
+        }
+
+        [STAThread]
         static void Main()
         {
             IntPtr ptr = GetConsoleWindow();
@@ -144,7 +154,7 @@ namespace PrinterSimulator
                 switch (ch)
                 {
                     case 'P': // Print
-                        PrintFile(printer.GetPrinterSim());
+                        PrintFile(printer.GetPrinterSim(), getFile());
                         break;
 
                     case 'T': // Test menu
