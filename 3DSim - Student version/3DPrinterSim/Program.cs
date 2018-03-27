@@ -155,7 +155,12 @@ namespace PrinterSimulator
                 switch (ch)
                 {
                     case 'P': // Print
-                        PrintFile(printer.GetPrinterSim(), getFile());
+                        string fileName = getFile();
+                        if (fileName == "")
+                        {
+                            break;
+                        }
+                        PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
                     case 'T': // Test menu
