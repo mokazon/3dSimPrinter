@@ -128,6 +128,7 @@ namespace PrinterSimulator
             string versionNum = response.Split(' ')[1];
 
             #region Testing Firmware Processing Commands
+            p = Packet.RaiseBuildPlatformCommand();
             #endregion
 
             bool fDone = false;
@@ -148,6 +149,7 @@ namespace PrinterSimulator
                         break;
 
                     case 'T': // Test menu
+                        while (CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p) != "SUCCESS");
                         break;
 
                     case 'Q' :  // Quite

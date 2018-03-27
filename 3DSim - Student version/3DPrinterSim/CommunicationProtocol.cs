@@ -27,8 +27,6 @@ namespace PrinterSimulator
                 }
                 string result = ASCIIEncoding.ASCII.GetString(response.ToArray());
                 return result;
-                //if(result == "SUCCESS" || result.Contains("VERSION")) { return true; }
-                //return false;
             }
             pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
             return "Invalid Header";

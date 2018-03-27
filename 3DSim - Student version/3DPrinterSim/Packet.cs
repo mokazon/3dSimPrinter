@@ -55,17 +55,17 @@ namespace PrinterSimulator
 
         public static Packet ResetBuildPlatformCommand()
         {
-            return new Packet((byte)CommunicationCommand.ResetBuildPlatform, new byte[0]);
+            return new Packet((byte)CommunicationCommand.ResetBuildPlatform, new byte[1]);
         }
 
         public static Packet RaiseBuildPlatformCommand()
         {
-            return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, new byte[0]);
+            return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, new byte[1]);
         }
 
         public static Packet ToTopCommand()
         {
-            return new Packet((byte)CommunicationCommand.ToTop, new byte[0]);
+            return new Packet((byte)CommunicationCommand.ToTop, new byte[1]);
         }
 
         public static Packet AimLaserCommand(float x, float y)
@@ -77,7 +77,7 @@ namespace PrinterSimulator
 
         public static Packet GetFirmwareVersionCommand()
         {
-            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[0]);
+            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
         }
     }
 }

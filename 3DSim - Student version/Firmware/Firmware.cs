@@ -32,7 +32,7 @@ namespace Firmware
                 byte[] ack = CommunicationProtocol.ReadBlocking(printer, 1);
                 if (ack[0] == 0xA5)
                 {
-                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,1000);
+                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,10000);
                     if(data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
