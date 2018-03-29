@@ -12,7 +12,7 @@ namespace Firmware
         /// <param name="pc"></param>
         /// <param name="expectedBytes">The number of bytes expected</param>
         /// <returns></returns>
-        public byte[] ReadBlocking(Hardware.PrinterControl pc, int expectedBytes)
+        public static byte[] ReadBlocking(Hardware.PrinterControl pc, int expectedBytes)
         {
             byte[] data = new byte[expectedBytes];
             while(pc.ReadSerialFromHost(data,expectedBytes) == 0) { }
@@ -25,7 +25,7 @@ namespace Firmware
         /// <param name="pc"></param>
         /// <param name="expectedBytes">The number of bytes expected</param>
         /// <returns></returns>
-        public byte[] Read(Hardware.PrinterControl pc, int expectedBytes)
+        public static byte[] Read(Hardware.PrinterControl pc, int expectedBytes)
         {
             byte[] data = new byte[expectedBytes];
             if(pc.ReadSerialFromHost(data, expectedBytes) == 0) { return new byte[0]; }
@@ -39,7 +39,7 @@ namespace Firmware
         /// <param name="expectedBytes">The number of bytes expected</param>
         /// <param name="milliseconds">Time to wait in miliseconds</param>
         /// <returns></returns>
-        public byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
+        public static byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
         {
             byte[] data = new byte[expectedBytes];
             //[] d = ReadBlocking(pc, 1);

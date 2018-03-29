@@ -77,7 +77,7 @@ namespace PrinterSimulator
 
         public static Packet GetFirmwareVersionCommand()
         {
-            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1] { 2 });
+            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
         }
     }
 }
