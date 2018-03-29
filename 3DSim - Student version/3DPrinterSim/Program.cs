@@ -160,6 +160,12 @@ namespace PrinterSimulator
                         {
                             break;
                         }
+                        Packet resetPacket = Packet.ResetBuildPlatformCommand();
+                        string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
+                        while (!response.Contains("SUCCESS"))
+                        {
+                            resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
+                        }
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
