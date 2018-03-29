@@ -9,38 +9,43 @@ namespace PrinterSimulator
     {
         static public string SendPacket(PrinterControl pc, Packet pkt)
         {
-            byte[] header = pkt.GetHeaderBytes();
-            //Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
-            pc.WriteSerialToFirmware(header,header.Length);
-            byte[] headerCheck = ReadBlocking(pc, header.Length);
-            //Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
-            if (headerCheck[0] == header[0] && headerCheck[1] == header[1] && headerCheck[2] == header[2] && headerCheck[3] == header[3])
+            string reponse = "";
+            while (reponse != "SUCCESS" && !reponse.Contains("VERSION"))
             {
-                //Console.WriteLine("Host - Sending ACK");
-                pc.WriteSerialToFirmware(new byte[] { 0xA5 },1);
-                //Console.WriteLine("Host - Sent ACK");
-                //Console.WriteLine("Host - Sending Data");
-                //foreach(byte x in pkt.Data) { Console.WriteLine("H: "+x); }
-                pc.WriteSerialToFirmware(pkt.Data,pkt.Data.Length);
-                //Console.WriteLine("Host - Sent Data");
-                //Console.WriteLine("Host - Waiting for response");
-                byte[] partialResponse = Read(pc,1);
-                List<byte> response = new List<byte>();
-                while(partialResponse.Length == 0) { partialResponse = Read(pc, 1); }
-                while (partialResponse[0] != 0)
+                byte[] header = pkt.GetHeaderBytes();
+                //Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
+                pc.WriteSerialToFirmware(header, header.Length);
+                byte[] headerCheck = ReadBlocking(pc, header.Length);
+                //Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
+                if (headerCheck[0] == header[0] && headerCheck[1] == header[1] && headerCheck[2] == header[2] && headerCheck[3] == header[3])
                 {
-                    response.Add(partialResponse[0]);
-                    partialResponse = Read(pc, 1);
-                    if(partialResponse.Length == 0) { break; }
+                    //Console.WriteLine("Host - Sending ACK");
+                    pc.WriteSerialToFirmware(new byte[] { 0xA5 }, 1);
+                    //Console.WriteLine("Host - Sent ACK");
+                    //Console.WriteLine("Host - Sending Data");
+                    //foreach(byte x in pkt.Data) { Console.WriteLine("H: "+x); }
+                    pc.WriteSerialToFirmware(pkt.Data, pkt.Data.Length);
+                    //Console.WriteLine("Host - Sent Data");
+                    //Console.WriteLine("Host - Waiting for response");
+                    byte[] partialResponse = Read(pc, 1);
+                    List<byte> response = new List<byte>();
+                    while (partialResponse.Length == 0) { partialResponse = Read(pc, 1); }
+                    while (partialResponse[0] != 0)
+                    {
+                        response.Add(partialResponse[0]);
+                        partialResponse = Read(pc, 1);
+                        if (partialResponse.Length == 0) { break; }
+                    }
+                    reponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
+                    return reponse;
+                    //Console.WriteLine("Host - Got Response");
                 }
-                string result = ASCIIEncoding.ASCII.GetString(response.ToArray());
-                //Console.WriteLine("Host - Got Response");
-                return result;
+                //Console.WriteLine("Host - Sending NACK");
+                pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
+                //Console.WriteLine("Host - SentNACK");
+                reponse = "Invalid Header";
             }
-            //Console.WriteLine("Host - Sending NACK");
-            pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
-            //Console.WriteLine("Host - SentNACK");
-            return "Invalid Header";
+            return reponse;
         }
         /// <summary>
         /// Read data from firmware. Blocks the thread until the expected bytes are received.

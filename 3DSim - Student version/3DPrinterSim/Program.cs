@@ -160,19 +160,14 @@ namespace PrinterSimulator
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             Packet p = Packet.GetFirmwareVersionCommand();//new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
-            int asdf = 0;
+            //CommunicationProtocol.SendPacket(printer.GetPrinterSim(),Packet.ResetBuildPlatformCommand());
             string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-            while (!response.Contains("VERSION") && asdf < 10)
-            {
-                response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-                asdf++;
-            }
             string versionNum = response.Split(' ')[1];
 
             bool fDone = false;
             while (!fDone)
             {
-                //Console.Clear();
+                Console.Clear();
                 Console.WriteLine("Firmware Version: " + versionNum);
                 Console.WriteLine("3D Printer Simulation - Control Menu\n");
                 Console.WriteLine("P - Print");
@@ -188,12 +183,17 @@ namespace PrinterSimulator
                         {
                             break;
                         }
+                        Packet resetPacket = Packet.ResetBuildPlatformCommand();
+                        string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
+                        while (!response.Contains("SUCCESS"))
+                        {
+                            resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
+                        }
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
                     case 'T': // Test menu
-                        int i = 0;
-                        while (CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.RaiseBuildPlatformCommand()) != "SUCCESS" && i < 10) { i++; }
+                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.ResetBuildPlatformCommand());
                         break;
 
                     case 'Q' :  // Quite
