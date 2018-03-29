@@ -29,26 +29,33 @@ namespace PrinterSimulator
                     for (int i = 1; i < commandElements.Length; i++)
                     {
                         string element = commandElements[i].ToUpper();
-                        string valueString = element.Substring(1, element.Length - 1);
-                        float value = float.Parse(valueString, System.Globalization.CultureInfo.InvariantCulture);
+                        if (element[0] == ';')
+                        {
+                            break;
+                        }
+                        if (element.Length > 1)
+                        {
+                            string valueString = element.Substring(1, element.Length - 1);
+                            float value = float.Parse(valueString, System.Globalization.CultureInfo.InvariantCulture);
 
-                        if (element[0] == 'X')
-                        {
-                            this.x = value;
-                        }
-                        else if (element[0] == 'Y')
-                        {
-                            this.y = value;
-                        }
-                        else if (element[0] == 'Z')
-                        {
-                            this.z = value;
-                        }
-                        else if (element[0] == 'E')
-                        {
-                            if (value != 0)
+                            if (element[0] == 'X')
                             {
-                                this.laser = true;
+                                this.x = value;
+                            }
+                            else if (element[0] == 'Y')
+                            {
+                                this.y = value;
+                            }
+                            else if (element[0] == 'Z')
+                            {
+                                this.z = value;
+                            }
+                            else if (element[0] == 'E')
+                            {
+                                if (value != 0)
+                                {
+                                    this.laser = true;
+                                }
                             }
                         }
                     }
@@ -77,7 +84,7 @@ namespace PrinterSimulator
             {
                 GCODECommand command = new GCODECommand(line);
 
-                // SEND COMMAND TO FIRMWARE
+                    // SEND COMMAND TO FIRMWARE
 
                 line = file.ReadLine();
             }
@@ -153,7 +160,12 @@ namespace PrinterSimulator
                 switch (ch)
                 {
                     case 'P': // Print
-                        PrintFile(printer.GetPrinterSim(), getFile());
+                        string fileName = getFile();
+                        if (fileName == "")
+                        {
+                            break;
+                        }
+                        PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
                     case 'T': // Test menu
