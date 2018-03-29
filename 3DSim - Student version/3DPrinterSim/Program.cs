@@ -24,7 +24,7 @@ namespace PrinterSimulator
             {
                 char[] delimiters = { ' ' };
                 string[] commandElements = cmd.Split(delimiters);
-                if (commandElements[0].Equals("G1"))
+                if (commandElements[0].Equals("G1") || commandElements[0].Equals("G92"))
                 {
                     for (int i = 1; i < commandElements.Length; i++)
                     {
@@ -79,12 +79,35 @@ namespace PrinterSimulator
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
+            double currentHeight = 0;
+            double layerHeight = 0.5;
+
+            float plateWidthX = 200;
+            float plateWidthY = 200;
+
+            float aimWidthX = 2.5F;
+            float aimWidthY = 2.5F;
+
             string line = file.ReadLine();
             while (line != null)
             {
                 GCODECommand command = new GCODECommand(line);
 
-                    // SEND COMMAND TO FIRMWARE
+                if (command.z != 0)
+                {
+                    double layers = (command.z - currentHeight) / layerHeight;
+                    for (double i = 0.5; i < layers; i++)
+                    {
+                        CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
+                        currentHeight += layerHeight;
+                    }
+                }
+                if (command.x != 0 || command.y != 0)
+                {
+                    CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
+                }
+                CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser);
+                
 
                 line = file.ReadLine();
             }
