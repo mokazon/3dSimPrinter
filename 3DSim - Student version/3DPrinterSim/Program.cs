@@ -75,7 +75,6 @@ namespace PrinterSimulator
         static void PrintFile(PrinterControl simCtl, string fileName)
         {
             System.IO.StreamReader file = new System.IO.StreamReader(fileName);
-
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
@@ -92,7 +91,7 @@ namespace PrinterSimulator
             while (line != null)
             {
                 GCODECommand command = new GCODECommand(line);
-
+                
                 if (command.z != 0)
                 {
                     double layers = (command.z - currentHeight) / layerHeight;
@@ -101,12 +100,13 @@ namespace PrinterSimulator
                         CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
                         currentHeight += layerHeight;
                     }
+                    Console.WriteLine(layers);
                 }
                 if (command.x != 0 || command.y != 0)
                 {
                     CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
                 }
-                CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser);
+                CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
                 
 
                 line = file.ReadLine();
@@ -185,10 +185,7 @@ namespace PrinterSimulator
                         }
                         Packet resetPacket = Packet.ResetBuildPlatformCommand();
                         string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
-                        while (!response.Contains("SUCCESS"))
-                        {
-                            resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
-                        }
+
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
