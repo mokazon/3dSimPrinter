@@ -23,34 +23,56 @@ namespace Firmware
         // Handle incoming commands from the serial link
         void Process()
         {
+            CommunicationProtocol communicationProtocol = new CommunicationProtocol();
             // Todo - receive incoming commands from the serial link and act on those commands by calling the low-level hardwarwe APIs, etc.
             while (!fDone)
             {
-                byte[] header = CommunicationProtocol.ReadBlocking(printer, 4);
+                byte[] header = communicationProtocol.ReadBlocking(printer, 4);
+                //Console.WriteLine("Firmware - Received header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
                 byte dataLength = header[1];
-                printer.WriteSerialToHost(header, header.Length);
-                byte[] ack = CommunicationProtocol.ReadBlocking(printer, 1);
+                //Console.WriteLine("Firmware - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
+                printer.WriteSerialToHost(header, 4);
+                //Console.WriteLine("Firmware - Waiting for ACK");
+                byte[] ack = communicationProtocol.ReadBlocking(printer, 1);
                 if (ack[0] == 0xA5)
                 {
-                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,10000);
-                    if(data.Length == 0)
+                    //Console.WriteLine("Firmware - ACKed");
+                    //Console.WriteLine("Firmware - Waiting for data");
+                    byte[] data = communicationProtocol.ReadWait(printer,dataLength,10000);
+                    if (data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
+                        //Console.WriteLine("Firmware - Sending Timeout");
                         printer.WriteSerialToHost(result, result.Length);
+                        //Console.WriteLine("Firmware - Sent Timeout");
                         continue;
                     }
+                    //Console.WriteLine("Firmware - Got data : "+data[0]);
+                    //foreach(byte x in data)
+                    //{
+                    //    Console.WriteLine("F: "+x);
+                    //}
                     Packet p = new Packet(header[0], data);
                     if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
                     {
+                        //Console.WriteLine("Firmware - Correct Checksum");
                         byte[] result = ProcessCommand(header[0], data);
-
+                        //Console.WriteLine("Firmware - Sending Response");
                         printer.WriteSerialToHost(result, result.Length);
+                        //Console.WriteLine("Firmware - Sent Response");
                     }
                     else
                     {
+                        //Console.WriteLine("Firmware - Incorrect Checksum");
                         byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
+                        //Console.WriteLine("Firmware - Sending CHECKSUM");
                         printer.WriteSerialToHost(result, result.Length);
+                        //Console.WriteLine("Firmware - Sent CHECKSUM");
                     }
+                }
+                else
+                {
+                    //Console.WriteLine("Firmware - Not ACK:" + ack[0]);
                 }
             }
         }
