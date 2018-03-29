@@ -121,7 +121,7 @@ namespace Firmware
         public void WaitForInit()
         {
             while (!fInitialized)
-                Thread.Sleep(100);
+                Thread.Sleep(500);
         }
 
         public void ResetZRail()

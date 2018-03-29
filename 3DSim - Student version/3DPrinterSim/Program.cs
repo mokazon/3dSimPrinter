@@ -137,12 +137,10 @@ namespace PrinterSimulator
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             Packet p = Packet.GetFirmwareVersionCommand();//new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
-            int asdf = 0;
             string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-            while (!response.Contains("VERSION") && asdf < 10)
+            while (!response.Contains("VERSION"))
             {
                 response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-                asdf++;
             }
             string versionNum = response.Split(' ')[1];
 
@@ -164,6 +162,12 @@ namespace PrinterSimulator
                         if (fileName == "")
                         {
                             break;
+                        }
+                        Packet resetPacket = Packet.ResetBuildPlatformCommand();
+                        string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
+                        while (!response.Contains("SUCCESS"))
+                        {
+                            resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
                         }
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
