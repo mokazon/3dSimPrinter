@@ -129,22 +129,20 @@ namespace PrinterSimulator
             SetForegroundWindow(ptr);
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
-            Packet p = new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
+            Packet p = Packet.GetFirmwareVersionCommand();//new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
+            int asdf = 0;
             string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-            while (!response.Contains("VERSION"))
+            while (!response.Contains("VERSION") && asdf < 10)
             {
                 response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
+                asdf++;
             }
             string versionNum = response.Split(' ')[1];
-
-            #region Testing Firmware Processing Commands
-            p = Packet.RaiseBuildPlatformCommand();
-            #endregion
 
             bool fDone = false;
             while (!fDone)
             {
-                Console.Clear();
+                //Console.Clear();
                 Console.WriteLine("Firmware Version: " + versionNum);
                 Console.WriteLine("3D Printer Simulation - Control Menu\n");
                 Console.WriteLine("P - Print");
@@ -159,7 +157,8 @@ namespace PrinterSimulator
                         break;
 
                     case 'T': // Test menu
-                        while (CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p) != "SUCCESS");
+                        int i = 0;
+                        while (CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.RaiseBuildPlatformCommand()) != "SUCCESS" && i < 10) { i++; }
                         break;
 
                     case 'Q' :  // Quite
