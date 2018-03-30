@@ -39,6 +39,7 @@ namespace Firmware
                     //Console.WriteLine("Firmware - ACKed");
                     //Console.WriteLine("Firmware - Waiting for data");
                     byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,10000);
+
                     if (data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
