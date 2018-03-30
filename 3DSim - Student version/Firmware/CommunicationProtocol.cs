@@ -67,6 +67,7 @@ namespace Firmware
         RaiseBuildPlatform = 2,
         ToTop = 3,
         AimLaser = 4,
-        GetFirmwareVersion = 5
+        GetFirmwareVersion = 5,
+        LowerBuildPlatform = 6
     }
 }

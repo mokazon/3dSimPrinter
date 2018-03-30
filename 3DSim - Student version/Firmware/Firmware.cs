@@ -91,6 +91,10 @@ namespace Firmware
             {
                 RaiseZRail();
             }
+            else if(CmdByte == (byte)CommunicationCommand.LowerBuildPlatform)
+            {
+                LowerZRail();
+            }
             else if(CmdByte == (byte)CommunicationCommand.ToTop)
             {
                 ZRailToTop();
@@ -141,6 +145,14 @@ namespace Firmware
             for (int i = 0; i < 200; i++)
             {
                 printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+            }
+        }
+
+        public void LowerZRail()
+        {
+            for (int i = 0; i < 200; i++)
+            {
+                printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
             }
         }
 

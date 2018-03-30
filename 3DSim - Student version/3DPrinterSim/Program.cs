@@ -90,14 +90,26 @@ namespace PrinterSimulator
             string line = file.ReadLine();
             while (line != null)
             {
+                //Console.WriteLine(line);
+
                 GCODECommand command = new GCODECommand(line);
                 
-                if (command.z != 0)
+                if (command.z > 0)
                 {
                     double layers = (command.z - currentHeight) / layerHeight;
                     for (double i = 0.5; i < layers; i++)
                     {
                         CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
+                        currentHeight += layerHeight;
+                    }
+                    Console.WriteLine(layers);
+                }
+                if (command.z < 0)
+                {
+                    double layers = (command.z - currentHeight) / layerHeight;
+                    for (double i = 0.5; i < layers; i++)
+                    {
+                        CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
                         currentHeight += layerHeight;
                     }
                     Console.WriteLine(layers);
