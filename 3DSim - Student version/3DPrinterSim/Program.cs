@@ -202,7 +202,7 @@ namespace PrinterSimulator
                         break;
 
                     case 'T': // Test menu
-                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.ResetBuildPlatformCommand());
+                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.LowerBuildPlatformCommand());
                         break;
 
                     case 'Q' :  // Quite

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
+using System.Linq;
 namespace Firmware
 {
     class CommunicationProtocol
@@ -41,9 +42,10 @@ namespace Firmware
         /// <returns></returns>
         public static byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
         {
+            byte[] firstByte = ReadBlocking(pc,1);
+            expectedBytes--;
+            if(expectedBytes == 0) { return firstByte; }
             byte[] data = new byte[expectedBytes];
-            //[] d = ReadBlocking(pc, 1);
-            //if(expectedBytes-1 == 0) { return d; }
             Timer timer = new Timer(milliseconds);
             timer.AutoReset = false;
             timer.Start();
@@ -53,7 +55,7 @@ namespace Firmware
                 if(i != 0)
                 {
                     timer.Stop();
-                    return data;
+                    return firstByte.Concat(data).ToArray();
                 }
             }
             return new byte[0];

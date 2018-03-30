@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Hardware;
 using System.Timers;
+using System.Linq;
 namespace PrinterSimulator
 {
     class CommunicationProtocol
@@ -82,6 +83,9 @@ namespace PrinterSimulator
         /// <returns></returns>
         public static byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
         {
+            byte[] firstByte = ReadBlocking(pc, 1);
+            expectedBytes--;
+            if (expectedBytes == 0) { return firstByte; }
             byte[] data = new byte[expectedBytes];
             Timer timer = new Timer(milliseconds);
             timer.AutoReset = false;
@@ -89,10 +93,10 @@ namespace PrinterSimulator
             while (timer.Enabled)
             {
                 int i = pc.ReadSerialFromFirmware(data, expectedBytes);
-                if (i!=0)
+                if (i != 0)
                 {
                     timer.Stop();
-                    return data;
+                    return firstByte.Concat(data).ToArray();
                 }
             }
             return new byte[0];
