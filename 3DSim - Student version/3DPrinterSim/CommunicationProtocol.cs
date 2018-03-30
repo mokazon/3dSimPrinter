@@ -37,7 +37,7 @@ namespace PrinterSimulator
                         if (partialResponse.Length == 0) { break; }
                     }
                     reponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
-                    return reponse;
+                    continue;
                     //Console.WriteLine("Host - Got Response");
                 }
                 //Console.WriteLine("Host - Sending NACK");
