@@ -78,7 +78,7 @@ namespace PrinterSimulator
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
-            double currentHeight = 0;
+            double currentHeight = 0.5;
             double layerHeight = 0.5;
 
             float plateWidthX = 200;
@@ -90,36 +90,45 @@ namespace PrinterSimulator
             string line = file.ReadLine();
             while (line != null)
             {
-                //Console.WriteLine(line);
+                Console.WriteLine(line);
 
                 GCODECommand command = new GCODECommand(line);
                 
-                if (command.z > 0)
+                if (command.z > currentHeight)
                 {
                     double layers = (command.z - currentHeight) / layerHeight;
                     for (double i = 0.5; i < layers; i++)
                     {
                         CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
+                        /*for (int u = 0; u < 200; u++)
+                        {
+                            simCtl.StepStepper(PrinterControl.StepperDir.STEP_UP);
+                        }*/
                         currentHeight += layerHeight;
                     }
-                    Console.WriteLine(layers);
+                    //Console.WriteLine(currentHeight);
                 }
-                if (command.z < 0)
+                if (command.z < currentHeight && command.z != 0)
                 {
-                    double layers = (command.z - currentHeight) / layerHeight;
+                    double layers = (-1 * (command.z - currentHeight) / layerHeight);
                     for (double i = 0.5; i < layers; i++)
                     {
                         CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
-                        currentHeight += layerHeight;
+                        /*for (int u = 0; u < 200; u++)
+                        {
+                            simCtl.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
+                        }*/
+                        currentHeight -= layerHeight;
                     }
-                    Console.WriteLine(layers);
+                    //Console.WriteLine(currentHeight);
                 }
                 if (command.x != 0 || command.y != 0)
                 {
                     CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
+                    //simCtl.MoveGalvos((command.x / 100f) * 2.5f, (command.y / 100f) * 2.5f);
                 }
                 CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
-                
+                //simCtl.SetLaser(command.laser);
 
                 line = file.ReadLine();
             }
@@ -169,7 +178,7 @@ namespace PrinterSimulator
             firmware.WaitForInit();
 
             SetForegroundWindow(ptr);
-            //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
+
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             Packet p = Packet.GetFirmwareVersionCommand();//new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
             //CommunicationProtocol.SendPacket(printer.GetPrinterSim(),Packet.ResetBuildPlatformCommand());
@@ -205,7 +214,7 @@ namespace PrinterSimulator
                         CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.LowerBuildPlatformCommand());
                         break;
 
-                    case 'Q' :  // Quite
+                    case 'Q' :  // Quit
                         printer.Stop();
                         firmware.Stop();
                         fDone = true;

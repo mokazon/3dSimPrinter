@@ -38,12 +38,12 @@ namespace Firmware
                 {
                     //Console.WriteLine("Firmware - ACKed");
                     //Console.WriteLine("Firmware - Waiting for data");
-                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,1000);
+                    byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,5000);
 
                     if (data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
-                        //Console.WriteLine("Firmware - Sending Timeout");
+                        Console.WriteLine("Firmware - Sending Timeout");
                         printer.WriteSerialToHost(result, result.Length);
                         //Console.WriteLine("Firmware - Sent Timeout");
                         continue;
@@ -56,7 +56,7 @@ namespace Firmware
                     Packet p = new Packet(header[0], data);
                     if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
                     {
-                        //Console.WriteLine("Firmware - Correct Checksum");
+                        Console.WriteLine("Firmware - Correct Checksum");
                         byte[] result = ProcessCommand(header[0], data);
                         //Console.WriteLine("Firmware - Sending Response");
                         printer.WriteSerialToHost(result, result.Length);
@@ -64,7 +64,7 @@ namespace Firmware
                     }
                     else
                     {
-                        //Console.WriteLine("Firmware - Incorrect Checksum");
+                        Console.WriteLine("Firmware - Incorrect Checksum");
                         byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
                         //Console.WriteLine("Firmware - Sending CHECKSUM");
                         printer.WriteSerialToHost(result, result.Length);
@@ -102,7 +102,7 @@ namespace Firmware
             }
             else if(CmdByte == (byte)CommunicationCommand.AimLaser)
             {
-                PointLaser(BitConverter.ToSingle(Data, 0), BitConverter.ToSingle(Data, 4));
+                PointLaser((BitConverter.ToSingle(Data, 0) / 100f) * 2.5f, (BitConverter.ToSingle(Data, 4) / 100f) * 2.5f);
             }
             else if(CmdByte == (byte)CommunicationCommand.GetFirmwareVersion)
             {
@@ -143,18 +143,18 @@ namespace Firmware
 
         public void RaiseZRail()
         {
-            for (int i = 0; i < 200; i++)
-            {
+            //for (int i = 0; i < 200; i++)
+            //{
                 printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
-            }
+            //}
         }
 
         public void LowerZRail()
         {
-            for (int i = 0; i < 200; i++)
-            {
+            //for (int i = 0; i < 200; i++)
+            //{
                 printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
-            }
+            //}
         }
 
         public void ZRailToTop()
