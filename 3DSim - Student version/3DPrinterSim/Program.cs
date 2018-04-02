@@ -90,7 +90,7 @@ namespace PrinterSimulator
             string line = file.ReadLine();
             while (line != null)
             {
-                Console.WriteLine(line);
+                //Console.WriteLine(line);
 
                 GCODECommand command = new GCODECommand(line);
                 
@@ -99,11 +99,11 @@ namespace PrinterSimulator
                     double layers = (command.z - currentHeight) / layerHeight;
                     for (double i = 0.5; i < layers; i++)
                     {
-                        CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
-                        /*for (int u = 0; u < 200; u++)
+                        //CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
+                        for (int u = 0; u < 200; u++)
                         {
                             simCtl.StepStepper(PrinterControl.StepperDir.STEP_UP);
-                        }*/
+                        }
                         currentHeight += layerHeight;
                     }
                     //Console.WriteLine(currentHeight);
@@ -113,22 +113,22 @@ namespace PrinterSimulator
                     double layers = (-1 * (command.z - currentHeight) / layerHeight);
                     for (double i = 0.5; i < layers; i++)
                     {
-                        CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
-                        /*for (int u = 0; u < 200; u++)
+                        //CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
+                        for (int u = 0; u < 200; u++)
                         {
                             simCtl.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
-                        }*/
+                        }
                         currentHeight -= layerHeight;
                     }
                     //Console.WriteLine(currentHeight);
                 }
                 if (command.x != 0 || command.y != 0)
                 {
-                    CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
-                    //simCtl.MoveGalvos((command.x / 100f) * 2.5f, (command.y / 100f) * 2.5f);
+                    //CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
+                    simCtl.MoveGalvos((command.x / 100f) * 2.5f, (command.y / 100f) * 2.5f);
                 }
-                CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
-                //simCtl.SetLaser(command.laser);
+                //CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
+                simCtl.SetLaser(command.laser);
 
                 line = file.ReadLine();
             }
