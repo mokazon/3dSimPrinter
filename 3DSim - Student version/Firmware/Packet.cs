@@ -9,7 +9,7 @@ namespace Firmware
         public byte Command;
         public uint Length;
         public ushort Checksum = 0;
-        public byte[] Data;
+        public byte[] Data = new byte[0];
 
         public Packet(byte Command, byte[] Data)
         {

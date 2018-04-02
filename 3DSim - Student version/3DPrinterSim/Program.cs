@@ -14,6 +14,8 @@ using System.Diagnostics;
 using Hardware;
 using Firmware;
 using System.Windows.Forms;
+
+using System.IO;
 namespace PrinterSimulator
 {
     class GCODECommand
@@ -78,7 +80,7 @@ namespace PrinterSimulator
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
-            double currentHeight = 0;
+            double currentHeight = .5;
             double layerHeight = 0.5;
 
             float plateWidthX = 200;
@@ -90,11 +92,10 @@ namespace PrinterSimulator
             string line = file.ReadLine();
             while (line != null)
             {
-                //Console.WriteLine(line);
-
                 GCODECommand command = new GCODECommand(line);
+                //Console.WriteLine(line);
                 
-                if (command.z > 0)
+                if (command.z > currentHeight)
                 {
                     double layers = (command.z - currentHeight) / layerHeight;
                     for (double i = 0.5; i < layers; i++)
@@ -104,13 +105,13 @@ namespace PrinterSimulator
                     }
                     Console.WriteLine(layers);
                 }
-                if (command.z < 0)
+                if (command.z < currentHeight && command.z!=0)
                 {
-                    double layers = (command.z - currentHeight) / layerHeight;
+                    double layers = (command.z - currentHeight) / layerHeight * -1;
                     for (double i = 0.5; i < layers; i++)
                     {
                         CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
-                        currentHeight += layerHeight;
+                        currentHeight -= layerHeight;
                     }
                     Console.WriteLine(layers);
                 }
@@ -118,6 +119,7 @@ namespace PrinterSimulator
                 {
                     CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
                 }
+                //Console.WriteLine("Laser: " + command.laser);
                 CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
                 
 

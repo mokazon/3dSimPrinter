@@ -10,43 +10,58 @@ namespace PrinterSimulator
     {
         static public string SendPacket(PrinterControl pc, Packet pkt)
         {
-            string reponse = "";
-            while (reponse != "SUCCESS" && !reponse.Contains("VERSION"))
+            string stringResponse = "";
+            while (stringResponse != "SUCCESS" && !stringResponse.Contains("VERSION"))
             {
                 byte[] header = pkt.GetHeaderBytes();
                 //Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
                 pc.WriteSerialToFirmware(header, header.Length);
+                header = pkt.GetHeaderBytes();
                 byte[] headerCheck = ReadBlocking(pc, header.Length);
                 //Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
                 if (headerCheck[0] == header[0] && headerCheck[1] == header[1] && headerCheck[2] == header[2] && headerCheck[3] == header[3])
                 {
+                    byte[] dataCopy = new byte[pkt.Length];
+                    pkt.Data.CopyTo(dataCopy, 0);
                     //Console.WriteLine("Host - Sending ACK");
                     pc.WriteSerialToFirmware(new byte[] { 0xA5 }, 1);
                     //Console.WriteLine("Host - Sent ACK");
                     //Console.WriteLine("Host - Sending Data");
-                    //foreach(byte x in pkt.Data) { Console.WriteLine("H: "+x); }
-                    pc.WriteSerialToFirmware(pkt.Data, pkt.Data.Length);
+                    //foreach (byte x in pkt.Data) { Console.WriteLine("H: " + x); }
+                    pc.WriteSerialToFirmware(dataCopy, dataCopy.Length);
                     //Console.WriteLine("Host - Sent Data");
                     //Console.WriteLine("Host - Waiting for response");
                     byte[] partialResponse = Read(pc, 1);
                     List<byte> response = new List<byte>();
                     while (partialResponse.Length == 0) { partialResponse = Read(pc, 1); }
-                    while (partialResponse[0] != 0)
+                    while (true)
                     {
-                        response.Add(partialResponse[0]);
+                        if (partialResponse.Length > 0)
+                        {
+                            response.Add(partialResponse[0]);
+                        }
                         partialResponse = Read(pc, 1);
-                        if (partialResponse.Length == 0) { break; }
+                        stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
+                        if (stringResponse == "SUCCESS") { break; }
+                        if (stringResponse.Contains("VERSION") && partialResponse.Length == 0) { break; }
+                        if (stringResponse == "CHECKSUM") { break; }
+                        if (stringResponse == "TIMEOUT") { break; }
+
+                        //if (partialResponse.Length == 0) { break; }
                     }
-                    reponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
+                    stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
+                    //Console.WriteLine("Host recieved response: "+stringResponse);
                     continue;
-                    //Console.WriteLine("Host - Got Response");
                 }
-                //Console.WriteLine("Host - Sending NACK");
-                pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
-                //Console.WriteLine("Host - SentNACK");
-                reponse = "Invalid Header";
+                else
+                {
+                    //Console.WriteLine("Host - Sending NACK");
+                    pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
+                    //Console.WriteLine("Host - SentNACK");
+                    stringResponse = "Invalid Header";
+                }
             }
-            return reponse;
+            return stringResponse;
         }
         /// <summary>
         /// Read data from firmware. Blocks the thread until the expected bytes are received.
