@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Hardware;
+using System.Diagnostics;
+
 namespace Firmware
 {
 
@@ -14,6 +16,10 @@ namespace Firmware
         string VersionNumber = "1.0";
         bool fDone = false;
         bool fInitialized = false;
+        double plateVelocity = 0;
+        double plateAccel = 0;
+        double plateZ = 0;
+        Stopwatch stopwatch = new Stopwatch();
 
         public FirmwareController(PrinterControl printer)
         {
@@ -131,15 +137,50 @@ namespace Firmware
                 Thread.Sleep(500);
         }
 
+        public void accelPlate(PrinterControl.StepperDir dir)
+        {
+            double deltaT = (double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency;
+            double stepHeight = 0.0025;
+            //double deltaT = stopwatch.ElapsedMilliseconds;
+            if (plateVelocity < 2 && plateVelocity > -2)
+            {
+                plateVelocity = 2.0;
+            }
+            double targetTime = (stepHeight) / plateVelocity;
+            if (deltaT > targetTime)
+            {
+                stopwatch.Reset();
+                stopwatch.Start();
+                printer.StepStepper(dir);
+                plateZ -= 1;
+
+                plateVelocity += 4.0 * (deltaT);
+
+                if (plateVelocity > 40.0)
+                {
+                    plateVelocity = 40.0;
+                }
+
+            }
+        }
+
         public void ResetZRail()
         {
+            Console.WriteLine("reset");
+            stopwatch.Reset();
+            stopwatch.Start();
             while (!printer.LimitSwitchPressed())
             {
-                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+                accelPlate(PrinterControl.StepperDir.STEP_UP);
             }
-            for (int i = 0; i < 39800; i++)
+            Console.WriteLine("reset2");
+            plateZ = 39800;
+            stopwatch.Reset();
+            stopwatch.Start();
+            plateVelocity = 0;
+            while (plateZ > 0)
             {
-                printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
+                accelPlate(PrinterControl.StepperDir.STEP_DOWN);
             }
         }
 
