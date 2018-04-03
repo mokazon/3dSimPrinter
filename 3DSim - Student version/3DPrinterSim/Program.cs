@@ -93,18 +93,16 @@ namespace PrinterSimulator
             string[] Lines = File.ReadAllLines(fileName);
             int total = Lines.Length;
             int iii = 0;
-            //line = Lines[iii];
 
             Console.WriteLine("Press C to cancel");
-            while (line != null)//iii < total)
+            while (line != null)
             {
                 if(Console.KeyAvailable)
                 {
                     char ch = Console.ReadKey().KeyChar;
                     if(char.ToUpper(ch) == 'C')
                     {
-                        CommunicationProtocol.SendPacket(simCtl, Packet.RemoveObject(false));
-                        return;
+                        break;
                     }
                 }
                 Console.WriteLine(iii + "/" + total);
@@ -203,6 +201,7 @@ namespace PrinterSimulator
                 Console.WriteLine("3D Printer Simulation - Control Menu\n");
                 Console.WriteLine("P - Print");
                 Console.WriteLine("T - Test");
+                Console.WriteLine("R - Remove Object");
                 Console.WriteLine("Q - Quit");
 
                 char ch = Char.ToUpper(Console.ReadKey().KeyChar);
@@ -221,7 +220,10 @@ namespace PrinterSimulator
                         break;
 
                     case 'T': // Test menu
-                        
+                        break;
+
+                    case 'R':
+                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.RemoveObject(false));
                         break;
 
                     case 'Q' :  // Quite
