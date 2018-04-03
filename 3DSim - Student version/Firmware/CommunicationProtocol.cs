@@ -70,6 +70,7 @@ namespace Firmware
         ToTop = 3,
         AimLaser = 4,
         GetFirmwareVersion = 5,
-        LowerBuildPlatform = 6
+        LowerBuildPlatform = 6,
+        RemoveObject = 7
     }
 }

@@ -84,31 +84,47 @@ namespace Firmware
         {
             if(CmdByte == (byte) CommunicationCommand.Laser)
             {
+                //Console.WriteLine("F: Laser");
                 SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte) CommunicationCommand.ResetBuildPlatform)
             {
+                //Console.WriteLine("F: Reset Build Platform");
                 ResetZRail();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.RaiseBuildPlatform)
             {
+                //Console.WriteLine("F: Raise Build Platform");
                 RaiseZRail();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.LowerBuildPlatform)
             {
+                //Console.WriteLine("F: Lower BuildPlatform");
                 LowerZRail();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.ToTop)
             {
+                //Console.WriteLine("F: ToTop");
                 ZRailToTop();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.AimLaser)
             {
+                //Console.WriteLine("F: AimLaser");
                 PointLaser(BitConverter.ToSingle(Data, 0), BitConverter.ToSingle(Data, 4));
+                SetLaser(BitConverter.ToBoolean(Data, 8));
             }
             else if(CmdByte == (byte)CommunicationCommand.GetFirmwareVersion)
             {
+                //Console.WriteLine("F: GetFrimware");
                 return Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
+            }
+            else if(CmdByte == (byte)CommunicationCommand.RemoveObject)
+            {
+                //printer.RemoveModelFromPrinter();
             }
             return Encoding.ASCII.GetBytes("SUCCESS");
         }
@@ -145,25 +161,25 @@ namespace Firmware
 
         public void RaiseZRail()
         {
-            //for (int i = 0; i < 200; i++)
-            //{
+            for (int i = 0; i < 200; i++)
+            {
                 printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
-            //}
+            }
         }
 
         public void LowerZRail()
         {
-            //for (int i = 0; i < 200; i++)
-            //{
-                printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
-            //}
+            for (int i = 0; i < 200; i++)
+            {
+                bool b = printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
+            }
         }
 
         public void ZRailToTop()
         {
             while(!printer.LimitSwitchPressed())
             {
-                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+                bool b = printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
             }
         }
 

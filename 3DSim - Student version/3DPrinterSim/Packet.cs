@@ -53,36 +53,42 @@ namespace PrinterSimulator
             return new Packet((byte)CommunicationCommand.Laser, BitConverter.GetBytes(onOff));
         }
 
-        public static Packet ResetBuildPlatformCommand()
+        public static Packet ResetBuildPlatformCommand(bool laserOnOff)
         {
-            return new Packet((byte)CommunicationCommand.ResetBuildPlatform, new byte[1]);
+            return new Packet((byte)CommunicationCommand.ResetBuildPlatform, BitConverter.GetBytes(laserOnOff));
         }
 
-        public static Packet RaiseBuildPlatformCommand()
+        public static Packet RaiseBuildPlatformCommand(bool laserOnOff)
         {
-            return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, new byte[1]);
+            return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, BitConverter.GetBytes(laserOnOff));
         }
 
-        public static Packet LowerBuildPlatformCommand()
+        public static Packet LowerBuildPlatformCommand(bool laserOnOff)
         {
-            return new Packet((byte)CommunicationCommand.LowerBuildPlatform, new byte[1]);
+            return new Packet((byte)CommunicationCommand.LowerBuildPlatform, BitConverter.GetBytes(laserOnOff));
         }
 
-        public static Packet ToTopCommand()
+        public static Packet ToTopCommand(bool laserOnOff)
         {
-            return new Packet((byte)CommunicationCommand.ToTop, new byte[1]);
+            return new Packet((byte)CommunicationCommand.ToTop, BitConverter.GetBytes(laserOnOff));
         }
 
-        public static Packet AimLaserCommand(float x, float y)
+        public static Packet AimLaserCommand(float x, float y, bool laserOnOff)
         {
             byte[] xData = BitConverter.GetBytes(x);
             byte[] yData = BitConverter.GetBytes(y);
-            return new Packet((byte)CommunicationCommand.AimLaser, xData.Concat(yData).ToArray());
+            byte[] laser = BitConverter.GetBytes(laserOnOff);
+            return new Packet((byte)CommunicationCommand.AimLaser, xData.Concat(yData).ToArray().Concat(laser).ToArray());
         }
 
         public static Packet GetFirmwareVersionCommand()
         {
             return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
+        }
+
+        public static Packet RemoveObject(bool laserOnOff)
+        {
+            return new Packet((byte)CommunicationCommand.RemoveObject, BitConverter.GetBytes(laserOnOff));
         }
     }
 }
