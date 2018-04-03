@@ -14,23 +14,23 @@ namespace PrinterSimulator
             while (stringResponse != "SUCCESS" && !stringResponse.Contains("VERSION"))
             {
                 byte[] header = pkt.GetHeaderBytes();
-                //Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
+                Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
                 pc.WriteSerialToFirmware(header, header.Length);
                 header = pkt.GetHeaderBytes();
                 byte[] headerCheck = ReadBlocking(pc, header.Length);
-                //Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
+                Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
                 if (headerCheck[0] == header[0] && headerCheck[1] == header[1] && headerCheck[2] == header[2] && headerCheck[3] == header[3])
                 {
                     byte[] dataCopy = new byte[pkt.Length];
                     pkt.Data.CopyTo(dataCopy, 0);
-                    //Console.WriteLine("Host - Sending ACK");
+                    Console.WriteLine("Host - Sending ACK");
                     pc.WriteSerialToFirmware(new byte[] { 0xA5 }, 1);
-                    //Console.WriteLine("Host - Sent ACK");
-                    //Console.WriteLine("Host - Sending Data");
-                    //foreach (byte x in pkt.Data) { Console.WriteLine("H: " + x); }
+                    Console.WriteLine("Host - Sent ACK");
+                    Console.WriteLine("Host - Sending Data");
+                    foreach (byte x in pkt.Data) { Console.WriteLine("H: " + x); }
                     pc.WriteSerialToFirmware(dataCopy, dataCopy.Length);
-                    //Console.WriteLine("Host - Sent Data");
-                    //Console.WriteLine("Host - Waiting for response");
+                    Console.WriteLine("Host - Sent Data");
+                    Console.WriteLine("Host - Waiting for response");
                     byte[] partialResponse = Read(pc, 1);
                     List<byte> response = new List<byte>();
                     while (partialResponse.Length == 0) { partialResponse = Read(pc, 1); }
@@ -43,21 +43,21 @@ namespace PrinterSimulator
                         partialResponse = Read(pc, 1);
                         stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
                         if (stringResponse == "SUCCESS") { break; }
-                        if (stringResponse.Contains("VERSION") && partialResponse.Length == 0) { break; }
-                        if (stringResponse == "CHECKSUM") { break; }
-                        if (stringResponse == "TIMEOUT") { break; }
+                        else if (stringResponse.Contains("VERSION") && partialResponse.Length == 0) { break; }
+                        else if (stringResponse == "CHECKSUM") { break; }
+                        else if (stringResponse == "TIMEOUT") { break; }
 
                         //if (partialResponse.Length == 0) { break; }
                     }
                     stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
-                    //Console.WriteLine("Host recieved response: "+stringResponse);
+                    Console.WriteLine("Host recieved response: "+stringResponse);
                     continue;
                 }
                 else
                 {
-                    //Console.WriteLine("Host - Sending NACK");
+                    Console.WriteLine("Host - Sending NACK");
                     pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
-                    //Console.WriteLine("Host - SentNACK");
+                    Console.WriteLine("Host - SentNACK");
                     stringResponse = "Invalid Header";
                 }
             }
@@ -126,6 +126,7 @@ namespace PrinterSimulator
         ToTop = 3,
         AimLaser = 4,
         GetFirmwareVersion = 5,
-        LowerBuildPlatform = 6
+        LowerBuildPlatform = 6,
+        RemoveObject = 7
     }
 }

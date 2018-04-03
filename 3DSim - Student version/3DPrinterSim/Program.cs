@@ -90,8 +90,25 @@ namespace PrinterSimulator
             float aimWidthY = 2.5F;
 
             string line = file.ReadLine();
-            while (line != null)
+            string[] Lines = File.ReadAllLines(fileName);
+            int total = Lines.Length;
+            int iii = 0;
+            //line = Lines[iii];
+
+            Console.WriteLine("Press C to cancel");
+            while (line != null)//iii < total)
             {
+                if(Console.KeyAvailable)
+                {
+                    char ch = Console.ReadKey().KeyChar;
+                    if(char.ToUpper(ch) == 'C')
+                    {
+                        CommunicationProtocol.SendPacket(simCtl, Packet.RemoveObject(false));
+                        return;
+                    }
+                }
+                Console.WriteLine(iii + "/" + total);
+                iii++;
                 GCODECommand command = new GCODECommand(line);
                 //Console.WriteLine(line);
                 
@@ -100,7 +117,7 @@ namespace PrinterSimulator
                     double layers = (command.z - currentHeight) / layerHeight;
                     for (double i = 0.5; i < layers; i++)
                     {
-                        CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
+                        CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand(command.laser));
                         currentHeight += layerHeight;
                     }
                     Console.WriteLine(layers);
@@ -110,19 +127,19 @@ namespace PrinterSimulator
                     double layers = (command.z - currentHeight) / layerHeight * -1;
                     for (double i = 0.5; i < layers; i++)
                     {
-                        CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
+                        CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand(command.laser));
                         currentHeight -= layerHeight;
                     }
                     Console.WriteLine(layers);
                 }
                 if (command.x != 0 || command.y != 0)
                 {
-                    CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
+                    CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY), command.laser));
                 }
                 //Console.WriteLine("Laser: " + command.laser);
-                CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
+                //CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
                 
-
+                //line = Lines[iii];
                 line = file.ReadLine();
             }
 
@@ -197,14 +214,14 @@ namespace PrinterSimulator
                         {
                             break;
                         }
-                        Packet resetPacket = Packet.ResetBuildPlatformCommand();
+                        Packet resetPacket = Packet.ResetBuildPlatformCommand(false);
                         string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
 
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
                     case 'T': // Test menu
-                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.LowerBuildPlatformCommand());
+                        
                         break;
 
                     case 'Q' :  // Quite

@@ -28,54 +28,54 @@ namespace Firmware
             while (!fDone)
             {
                 byte[] header = CommunicationProtocol.ReadBlocking(printer, 4);
-                //Console.WriteLine("Firmware - Received header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
+                Console.WriteLine("Firmware - Received header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
                 byte dataLength = header[1];
-                //Console.WriteLine("Firmware - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
+                Console.WriteLine("Firmware - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
                 byte[] headerCopy = new byte[header.Length];
                 header.CopyTo(headerCopy, 0);
                 printer.WriteSerialToHost(headerCopy, 4);
-                //Console.WriteLine("Firmware - Waiting for ACK");
+                Console.WriteLine("Firmware - Waiting for ACK");
                 byte[] ack = CommunicationProtocol.ReadBlocking(printer, 1);
                 if (ack[0] == 0xA5)
                 {
-                    //Console.WriteLine("Firmware - ACKed");
-                    //Console.WriteLine("Firmware - Waiting for data");
+                    Console.WriteLine("Firmware - ACKed");
+                    Console.WriteLine("Firmware - Waiting for data");
                     byte[] data = CommunicationProtocol.ReadWait(printer,dataLength,1000);
 
                     if (data.Length == 0)
                     {
                         byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
-                        //Console.WriteLine("Firmware - Sending Timeout");
+                        Console.WriteLine("Firmware - Sending Timeout");
                         printer.WriteSerialToHost(result, result.Length);
-                        //Console.WriteLine("Firmware - Sent Timeout");
+                        Console.WriteLine("Firmware - Sent Timeout");
                         continue;
                     }
-                    /*foreach(byte x in data)
+                    foreach(byte x in data)
                     {
                         Console.WriteLine("F: "+x);
-                    }*/
+                    }
                     Packet p = new Packet(header[0], data);
-                    //Console.WriteLine(BitConverter.GetBytes(p.Checksum)[0] + "," + BitConverter.GetBytes(p.Checksum)[1] + "?="+header[2]+","+header[3]);
+                    Console.WriteLine(BitConverter.GetBytes(p.Checksum)[0] + "," + BitConverter.GetBytes(p.Checksum)[1] + "?="+header[2]+","+header[3]);
                     if (p.Checksum == (ushort)BitConverter.ToInt16(header, 2))
                     {
-                        //Console.WriteLine("Firmware - Correct Checksum");
+                        Console.WriteLine("Firmware - Correct Checksum");
                         byte[] result = ProcessCommand(header[0], data);
-                        //Console.WriteLine("Firmware - Sending Response");
+                        Console.WriteLine("Firmware - Sending Response");
                         printer.WriteSerialToHost(result, result.Length);
-                        //Console.WriteLine("Firmware - Sent Response");
+                        Console.WriteLine("Firmware - Sent Response");
                     }
                     else
                     {
-                        //Console.WriteLine("Firmware - Incorrect Checksum");
+                        Console.WriteLine("Firmware - Incorrect Checksum");
                         byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
-                        //Console.WriteLine("Firmware - Sending CHECKSUM");
+                        Console.WriteLine("Firmware - Sending CHECKSUM");
                         printer.WriteSerialToHost(result, result.Length);
-                        //Console.WriteLine("Firmware - Sent CHECKSUM");
+                        Console.WriteLine("Firmware - Sent CHECKSUM");
                     }
                 }
                 else
                 {
-                    //Console.WriteLine("Firmware - Not ACK:" + ack[0]);
+                    Console.WriteLine("Firmware - Not ACK:" + ack[0]);
                 }
             }
         }
@@ -84,31 +84,47 @@ namespace Firmware
         {
             if(CmdByte == (byte) CommunicationCommand.Laser)
             {
+                //Console.WriteLine("F: Laser");
                 SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte) CommunicationCommand.ResetBuildPlatform)
             {
+                //Console.WriteLine("F: Reset Build Platform");
                 ResetZRail();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.RaiseBuildPlatform)
             {
+                //Console.WriteLine("F: Raise Build Platform");
                 RaiseZRail();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.LowerBuildPlatform)
             {
+                //Console.WriteLine("F: Lower BuildPlatform");
                 LowerZRail();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.ToTop)
             {
+                //Console.WriteLine("F: ToTop");
                 ZRailToTop();
+                SetLaser(BitConverter.ToBoolean(Data, 0));
             }
             else if(CmdByte == (byte)CommunicationCommand.AimLaser)
             {
+                //Console.WriteLine("F: AimLaser");
                 PointLaser(BitConverter.ToSingle(Data, 0), BitConverter.ToSingle(Data, 4));
+                SetLaser(BitConverter.ToBoolean(Data, 8));
             }
             else if(CmdByte == (byte)CommunicationCommand.GetFirmwareVersion)
             {
+                //Console.WriteLine("F: GetFrimware");
                 return Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
+            }
+            else if(CmdByte == (byte)CommunicationCommand.RemoveObject)
+            {
+                printer.RemoveModelFromPrinter();
             }
             return Encoding.ASCII.GetBytes("SUCCESS");
         }
@@ -145,25 +161,25 @@ namespace Firmware
 
         public void RaiseZRail()
         {
-            //for (int i = 0; i < 200; i++)
-            //{
+            for (int i = 0; i < 200; i++)
+            {
                 printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
-            //}
+            }
         }
 
         public void LowerZRail()
         {
-            //for (int i = 0; i < 200; i++)
-            //{
-                printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
-            //}
+            for (int i = 0; i < 200; i++)
+            {
+                bool b = printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
+            }
         }
 
         public void ZRailToTop()
         {
             while(!printer.LimitSwitchPressed())
             {
-                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+                bool b = printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
             }
         }
 
