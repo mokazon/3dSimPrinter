@@ -63,6 +63,11 @@ namespace PrinterSimulator
             return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, new byte[1]);
         }
 
+        public static Packet LowerBuildPlatformCommand()
+        {
+            return new Packet((byte)CommunicationCommand.LowerBuildPlatform, new byte[1]);
+        }
+
         public static Packet ToTopCommand()
         {
             return new Packet((byte)CommunicationCommand.ToTop, new byte[1]);
@@ -77,7 +82,7 @@ namespace PrinterSimulator
 
         public static Packet GetFirmwareVersionCommand()
         {
-            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1] { 2 });
+            return new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
         }
     }
 }

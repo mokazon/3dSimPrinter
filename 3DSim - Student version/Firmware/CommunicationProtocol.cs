@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
+using System.Linq;
 namespace Firmware
 {
     class CommunicationProtocol
@@ -12,7 +13,7 @@ namespace Firmware
         /// <param name="pc"></param>
         /// <param name="expectedBytes">The number of bytes expected</param>
         /// <returns></returns>
-        public byte[] ReadBlocking(Hardware.PrinterControl pc, int expectedBytes)
+        public static byte[] ReadBlocking(Hardware.PrinterControl pc, int expectedBytes)
         {
             byte[] data = new byte[expectedBytes];
             while(pc.ReadSerialFromHost(data,expectedBytes) == 0) { }
@@ -25,7 +26,7 @@ namespace Firmware
         /// <param name="pc"></param>
         /// <param name="expectedBytes">The number of bytes expected</param>
         /// <returns></returns>
-        public byte[] Read(Hardware.PrinterControl pc, int expectedBytes)
+        public static byte[] Read(Hardware.PrinterControl pc, int expectedBytes)
         {
             byte[] data = new byte[expectedBytes];
             if(pc.ReadSerialFromHost(data, expectedBytes) == 0) { return new byte[0]; }
@@ -39,11 +40,12 @@ namespace Firmware
         /// <param name="expectedBytes">The number of bytes expected</param>
         /// <param name="milliseconds">Time to wait in miliseconds</param>
         /// <returns></returns>
-        public byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
+        public static byte[] ReadWait(Hardware.PrinterControl pc, int expectedBytes, int milliseconds)
         {
+            byte[] firstByte = ReadBlocking(pc,1);
+            expectedBytes--;
+            if(expectedBytes == 0) { return firstByte; }
             byte[] data = new byte[expectedBytes];
-            //[] d = ReadBlocking(pc, 1);
-            //if(expectedBytes-1 == 0) { return d; }
             Timer timer = new Timer(milliseconds);
             timer.AutoReset = false;
             timer.Start();
@@ -53,7 +55,7 @@ namespace Firmware
                 if(i != 0)
                 {
                     timer.Stop();
-                    return data;
+                    return firstByte.Concat(data).ToArray();
                 }
             }
             return new byte[0];
@@ -67,6 +69,7 @@ namespace Firmware
         RaiseBuildPlatform = 2,
         ToTop = 3,
         AimLaser = 4,
-        GetFirmwareVersion = 5
+        GetFirmwareVersion = 5,
+        LowerBuildPlatform = 6
     }
 }

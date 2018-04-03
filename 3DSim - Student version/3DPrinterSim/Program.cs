@@ -14,6 +14,8 @@ using System.Diagnostics;
 using Hardware;
 using Firmware;
 using System.Windows.Forms;
+
+using System.IO;
 namespace PrinterSimulator
 {
     class GCODECommand
@@ -24,7 +26,7 @@ namespace PrinterSimulator
             {
                 char[] delimiters = { ' ' };
                 string[] commandElements = cmd.Split(delimiters);
-                if (commandElements[0].Equals("G1"))
+                if (commandElements[0].Equals("G1") || commandElements[0].Equals("G92"))
                 {
                     for (int i = 1; i < commandElements.Length; i++)
                     {
@@ -75,16 +77,51 @@ namespace PrinterSimulator
         static void PrintFile(PrinterControl simCtl, string fileName)
         {
             System.IO.StreamReader file = new System.IO.StreamReader(fileName);
-
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
+
+            double currentHeight = .5;
+            double layerHeight = 0.5;
+
+            float plateWidthX = 200;
+            float plateWidthY = 200;
+
+            float aimWidthX = 2.5F;
+            float aimWidthY = 2.5F;
 
             string line = file.ReadLine();
             while (line != null)
             {
                 GCODECommand command = new GCODECommand(line);
-
-                    // SEND COMMAND TO FIRMWARE
+                //Console.WriteLine(line);
+                
+                if (command.z > currentHeight)
+                {
+                    double layers = (command.z - currentHeight) / layerHeight;
+                    for (double i = 0.5; i < layers; i++)
+                    {
+                        CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand());
+                        currentHeight += layerHeight;
+                    }
+                    Console.WriteLine(layers);
+                }
+                if (command.z < currentHeight && command.z!=0)
+                {
+                    double layers = (command.z - currentHeight) / layerHeight * -1;
+                    for (double i = 0.5; i < layers; i++)
+                    {
+                        CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand());
+                        currentHeight -= layerHeight;
+                    }
+                    Console.WriteLine(layers);
+                }
+                if (command.x != 0 || command.y != 0)
+                {
+                    CommunicationProtocol.SendPacket(simCtl, Packet.AimLaserCommand((command.x / (plateWidthX / 2)) * aimWidthX, (command.y / (plateWidthY / 2) * aimWidthY)));
+                }
+                //Console.WriteLine("Laser: " + command.laser);
+                CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
+                
 
                 line = file.ReadLine();
             }
@@ -137,17 +174,14 @@ namespace PrinterSimulator
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             Packet p = Packet.GetFirmwareVersionCommand();//new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
+            //CommunicationProtocol.SendPacket(printer.GetPrinterSim(),Packet.ResetBuildPlatformCommand());
             string response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-            while (!response.Contains("VERSION"))
-            {
-                response = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), p);
-            }
             string versionNum = response.Split(' ')[1];
 
             bool fDone = false;
             while (!fDone)
             {
-                //Console.Clear();
+                Console.Clear();
                 Console.WriteLine("Firmware Version: " + versionNum);
                 Console.WriteLine("3D Printer Simulation - Control Menu\n");
                 Console.WriteLine("P - Print");
@@ -165,16 +199,12 @@ namespace PrinterSimulator
                         }
                         Packet resetPacket = Packet.ResetBuildPlatformCommand();
                         string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
-                        while (!response.Contains("SUCCESS"))
-                        {
-                            resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
-                        }
+
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
                     case 'T': // Test menu
-                        int i = 0;
-                        while (CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.RaiseBuildPlatformCommand()) != "SUCCESS" && i < 10) { i++; }
+                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.LowerBuildPlatformCommand());
                         break;
 
                     case 'Q' :  // Quite
