@@ -11,7 +11,6 @@ namespace PrinterSimulator
         static public string SendPacket(PrinterControl pc, Packet pkt)
         {
             string stringResponse = "";
-            //byte[] header;
             while (stringResponse != "SUCCESS" && !stringResponse.Contains("VERSION"))
             {
                 //Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
@@ -134,6 +133,7 @@ namespace PrinterSimulator
         AimLaser = 4,
         GetFirmwareVersion = 5,
         LowerBuildPlatform = 6,
-        RemoveObject = 7
+        RemoveObject = 7,
+        ToBottom = 8
     }
 }

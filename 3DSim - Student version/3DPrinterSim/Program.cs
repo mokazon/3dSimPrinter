@@ -117,7 +117,9 @@ namespace PrinterSimulator
                         CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand(command.laser));
                         currentHeight += layerHeight;
                     }
-                    //Console.WriteLine(layers);
+                    //CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand((int)Math.Round(layers),command.laser));
+                    //currentHeight += layerHeight*(int)Math.Round(layers);
+                    Console.WriteLine(layers);
                 }
                 else if (command.z < currentHeight && command.z!=0)
                 {

@@ -108,6 +108,12 @@ namespace Firmware
             else if(CmdByte == (byte)CommunicationCommand.RaiseBuildPlatform)
             {
                 //Console.WriteLine("F: Raise Build Platform");
+                /*int layers = BitConverter.ToInt32(Data, 0);
+                for (int i = 0; i < layers; i++)
+                {
+                    RaiseZRail();
+                }
+                SetLaser(BitConverter.ToBoolean(Data, 4));*/
                 RaiseZRail();
                 SetLaser(BitConverter.ToBoolean(Data, 0));
             }
@@ -137,6 +143,10 @@ namespace Firmware
             else if(CmdByte == (byte)CommunicationCommand.RemoveObject)
             {
                 //printer.RemoveModelFromPrinter();
+            }
+            else if(CmdByte == (byte)CommunicationCommand.ToBottom)
+            {
+                //TODO: lower z rail to bottom
             }
             return SuccessBytes;//Encoding.ASCII.GetBytes("SUCCESS");
         }
