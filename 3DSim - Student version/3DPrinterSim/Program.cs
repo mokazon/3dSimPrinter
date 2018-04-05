@@ -77,6 +77,10 @@ namespace PrinterSimulator
         static void PrintFile(PrinterControl simCtl, string fileName)
         {
             //System.IO.StreamReader file = new System.IO.StreamReader(fileName);
+            Packet topPacket = Packet.ToTopCommand(false);//.ResetBuildPlatformCommand(false);
+            string topResponse = CommunicationProtocol.SendPacket(simCtl, topPacket);
+            CommunicationProtocol.SendPacket(simCtl, Packet.ToBottom(false));
+
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
@@ -212,13 +216,12 @@ namespace PrinterSimulator
                         {
                             break;
                         }
-                        Packet resetPacket = Packet.ResetBuildPlatformCommand(false);
-                        string resetResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPacket);
 
                         PrintFile(printer.GetPrinterSim(), fileName);
                         break;
 
                     case 'T': // Test menu
+                        CommunicationProtocol.SendPacket(printer.GetPrinterSim(), Packet.ToBottom(false));
                         break;
 
                     case 'R':

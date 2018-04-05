@@ -146,7 +146,7 @@ namespace Firmware
             }
             else if(CmdByte == (byte)CommunicationCommand.ToBottom)
             {
-                //TODO: lower z rail to bottom
+                ZRailToBottom();
             }
             return SuccessBytes;//Encoding.ASCII.GetBytes("SUCCESS");
         }
@@ -234,9 +234,28 @@ namespace Firmware
 
         public void ZRailToTop()
         {
-            while(!printer.LimitSwitchPressed())
+            stopwatch.Reset();
+            stopwatch.Start();
+            while (!printer.LimitSwitchPressed())
+            {
+                accelPlate(PrinterControl.StepperDir.STEP_UP);
+            }
+            Console.WriteLine("reset2");
+            plateZ = 39800;
+            /*while(!printer.LimitSwitchPressed())
             {
                 bool b = printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+            }*/
+        }
+
+        public void ZRailToBottom()
+        {
+            stopwatch.Reset();
+            stopwatch.Start();
+            plateVelocity = 0;
+            while (plateZ > 0)
+            {
+                accelPlate(PrinterControl.StepperDir.STEP_DOWN);
             }
         }
 

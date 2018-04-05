@@ -21,7 +21,7 @@ namespace PrinterSimulator
                 header = pkt.GetHeaderBytes();
                 byte[] headerCheck = ReadBlocking(pc, header.Length);
                 //Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
-                if (headerCheck[0] == header[0] && headerCheck[1] == header[1] && headerCheck[2] == header[2] && headerCheck[3] == header[3])
+                if (headerCheck.SequenceEqual(header))
                 {
                     byte[] dataCopy = new byte[pkt.Length+1];
                     pkt.Data.CopyTo(dataCopy, 1);
