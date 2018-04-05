@@ -21,8 +21,14 @@ namespace Firmware
         double plateZ = 0;
         Stopwatch stopwatch = new Stopwatch();
 
+        byte[] TimeoutBytes = Encoding.ASCII.GetBytes("TIMEOUT");
+        byte[] ChecksumBytes = Encoding.ASCII.GetBytes("CHECKSUM");
+        byte[] SuccessBytes = Encoding.ASCII.GetBytes("SUCCESS");
+        byte[] VersionBytes;
+
         public FirmwareController(PrinterControl printer)
         {
+            VersionBytes = Encoding.ASCII.GetBytes("VERSION " + VersionNumber);
             this.printer = printer;
         }
 
@@ -50,9 +56,9 @@ namespace Firmware
 
                     if (data.Length == 0)
                     {
-                        byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
+                        //byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
                         //Console.WriteLine("Firmware - Sending Timeout");
-                        printer.WriteSerialToHost(result, result.Length);
+                        printer.WriteSerialToHost(TimeoutBytes, TimeoutBytes.Length);//(result, result.Length);
                         //Console.WriteLine("Firmware - Sent Timeout");
                         continue;
                     }
@@ -73,9 +79,9 @@ namespace Firmware
                     else
                     {
                         //Console.WriteLine("Firmware - Incorrect Checksum");
-                        byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
+                        //byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
                         //Console.WriteLine("Firmware - Sending CHECKSUM");
-                        printer.WriteSerialToHost(result, result.Length);
+                        printer.WriteSerialToHost(ChecksumBytes, ChecksumBytes.Length);//(result, result.Length);
                         //Console.WriteLine("Firmware - Sent CHECKSUM");
                     }
                 }
@@ -126,13 +132,13 @@ namespace Firmware
             else if(CmdByte == (byte)CommunicationCommand.GetFirmwareVersion)
             {
                 //Console.WriteLine("F: GetFrimware");
-                return Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
+                return VersionBytes;//Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
             }
             else if(CmdByte == (byte)CommunicationCommand.RemoveObject)
             {
                 //printer.RemoveModelFromPrinter();
             }
-            return Encoding.ASCII.GetBytes("SUCCESS");
+            return SuccessBytes;//Encoding.ASCII.GetBytes("SUCCESS");
         }
 
         public void Start()

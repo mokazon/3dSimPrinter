@@ -76,7 +76,7 @@ namespace PrinterSimulator
 
         static void PrintFile(PrinterControl simCtl, string fileName)
         {
-            System.IO.StreamReader file = new System.IO.StreamReader(fileName);
+            //System.IO.StreamReader file = new System.IO.StreamReader(fileName);
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
 
@@ -89,13 +89,13 @@ namespace PrinterSimulator
             float aimWidthX = 2.5F;
             float aimWidthY = 2.5F;
 
-            string line = file.ReadLine();
+            //string line = file.ReadLine();
             string[] Lines = File.ReadAllLines(fileName);
             int total = Lines.Length;
-            int iii = 0;
+            //int currentLine = 0;
 
             Console.WriteLine("Press C to cancel");
-            while (line != null)
+            foreach(string line in Lines)//while (line != null)
             {
                 if(Console.KeyAvailable)
                 {
@@ -105,10 +105,9 @@ namespace PrinterSimulator
                         break;
                     }
                 }
-                Console.WriteLine(iii + "/" + total);
-                iii++;
+                //Console.WriteLine(currentLine + "/" + total);
+                //currentLine++;
                 GCODECommand command = new GCODECommand(line);
-                //Console.WriteLine(line);
                 
                 if (command.z > currentHeight)
                 {
@@ -118,9 +117,9 @@ namespace PrinterSimulator
                         CommunicationProtocol.SendPacket(simCtl, Packet.RaiseBuildPlatformCommand(command.laser));
                         currentHeight += layerHeight;
                     }
-                    Console.WriteLine(layers);
+                    //Console.WriteLine(layers);
                 }
-                if (command.z < currentHeight && command.z!=0)
+                else if (command.z < currentHeight && command.z!=0)
                 {
                     double layers = (command.z - currentHeight) / layerHeight * -1;
                     for (double i = 0.5; i < layers; i++)
@@ -128,7 +127,7 @@ namespace PrinterSimulator
                         CommunicationProtocol.SendPacket(simCtl, Packet.LowerBuildPlatformCommand(command.laser));
                         currentHeight -= layerHeight;
                     }
-                    Console.WriteLine(layers);
+                    //Console.WriteLine(layers);
                 }
                 if (command.x != 0 || command.y != 0)
                 {
@@ -136,9 +135,6 @@ namespace PrinterSimulator
                 }
                 //Console.WriteLine("Laser: " + command.laser);
                 //CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
-                
-                //line = Lines[iii];
-                line = file.ReadLine();
             }
 
             swTimer.Stop();
@@ -186,6 +182,7 @@ namespace PrinterSimulator
             firmware.WaitForInit();
 
             SetForegroundWindow(ptr);
+
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             //Jordan - Creates packet and Send packet takes the packet as well as "GetPrinterSim"
             Packet p = Packet.GetFirmwareVersionCommand();//new Packet((byte)CommunicationCommand.GetFirmwareVersion, new byte[1]);
