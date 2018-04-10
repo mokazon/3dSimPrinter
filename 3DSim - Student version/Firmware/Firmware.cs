@@ -186,11 +186,11 @@ namespace Firmware
                 printer.StepStepper(dir);
                 plateZ -= 1;
 
-                plateVelocity += 4.0 * (deltaT);
+                plateVelocity += 3.9 * (deltaT);
 
-                if (plateVelocity > 40.0)
+                if (plateVelocity > 39.0)
                 {
-                    plateVelocity = 40.0;
+                    plateVelocity = 39.0;
                 }
 
             }
@@ -234,6 +234,7 @@ namespace Firmware
 
         public void ZRailToTop()
         {
+            plateVelocity = 0;
             stopwatch.Reset();
             stopwatch.Start();
             while (!printer.LimitSwitchPressed())

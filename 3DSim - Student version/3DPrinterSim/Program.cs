@@ -77,12 +77,13 @@ namespace PrinterSimulator
         static void PrintFile(PrinterControl simCtl, string fileName)
         {
             //System.IO.StreamReader file = new System.IO.StreamReader(fileName);
+            string[] Lines = File.ReadAllLines(fileName);
             Packet topPacket = Packet.ToTopCommand(false);//.ResetBuildPlatformCommand(false);
             string topResponse = CommunicationProtocol.SendPacket(simCtl, topPacket);
-            CommunicationProtocol.SendPacket(simCtl, Packet.ToBottom(false));
 
             Stopwatch swTimer = new Stopwatch();
             swTimer.Start();
+            CommunicationProtocol.SendPacket(simCtl, Packet.ToBottom(false));
 
             double currentHeight = .5;
             double layerHeight = 0.5;
@@ -94,7 +95,6 @@ namespace PrinterSimulator
             float aimWidthY = 2.5F;
 
             //string line = file.ReadLine();
-            string[] Lines = File.ReadAllLines(fileName);
             int total = Lines.Length;
             //int currentLine = 0;
 
@@ -142,7 +142,7 @@ namespace PrinterSimulator
                 //Console.WriteLine("Laser: " + command.laser);
                 //CommunicationProtocol.SendPacket(simCtl, Packet.LaserOnOffCommand(command.laser));
             }
-
+            CommunicationProtocol.SendPacket(simCtl, Packet.ToTopCommand(false));
             swTimer.Stop();
             long elapsedMS = swTimer.ElapsedMilliseconds;
 
