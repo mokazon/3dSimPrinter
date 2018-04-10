@@ -247,7 +247,6 @@ namespace PrinterSimulator
                                     Console.WriteLine("It did not work and it's Matthew's fault.");
 
                                 }
-                                Console.ReadLine();
                                 break;
                             case 'D':
                                 Packet downPacket = Packet.LowerBuildPlatformCommand(false);
@@ -260,7 +259,6 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and it's potentially Jermaine's fault.");
                                 }
-                                Console.ReadLine();
                                 break;
 
                             case 'R':
@@ -274,7 +272,6 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and it's John's fault.");
                                 }
-                                Console.ReadLine();
                                 break;
 
                             case 'T':
@@ -288,7 +285,6 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and it's Kerstan's fault.");
                                 }
-                                Console.ReadLine();
                                 break;
 
                             case 'L':
@@ -302,12 +298,10 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and it's never Jordan's fault.");
                                 }
-                                Console.ReadLine();
                                 break;
                             case 'A':
                                 Console.Write("Please input x coordinate: ");
                                 string xcoord = Console.ReadLine();
-                                Console.Write(float.Parse(xcoord));
 
                                 Console.Write("Please input y coordinate: ");
                                 string ycoord = Console.ReadLine();
@@ -333,7 +327,6 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and it's never Jordan's fault.");
                                 }
-                                Console.ReadLine();
                                 break;
                              
                             case 'V':
@@ -347,7 +340,6 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and Jordan is still the best.");
                                 }
-                                Console.ReadLine();
                                 break;
 
                             case 'O':
@@ -361,7 +353,6 @@ namespace PrinterSimulator
                                 {
                                     Console.WriteLine("It did not work and it's Jermaine's fault.");
                                 }
-                                Console.ReadLine();
                                 break;
 
                         }

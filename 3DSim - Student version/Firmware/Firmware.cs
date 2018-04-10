@@ -198,22 +198,25 @@ namespace Firmware
 
         public void ResetZRail()
         {
-            Console.WriteLine("reset");
+            //Console.WriteLine("reset");
             stopwatch.Reset();
             stopwatch.Start();
+            ZRailToTop();
+            /*plateVelocity = 0;
             while (!printer.LimitSwitchPressed())
             {
                 accelPlate(PrinterControl.StepperDir.STEP_UP);
-            }
-            Console.WriteLine("reset2");
+            }*/
+            //Console.WriteLine("reset2");
             plateZ = 39800;
             stopwatch.Reset();
             stopwatch.Start();
-            plateVelocity = 0;
+            ZRailToBottom();
+            /*plateVelocity = 0;
             while (plateZ > 0)
             {
                 accelPlate(PrinterControl.StepperDir.STEP_DOWN);
-            }
+            }*/
         }
 
         public void RaiseZRail()
@@ -241,7 +244,7 @@ namespace Firmware
             {
                 accelPlate(PrinterControl.StepperDir.STEP_UP);
             }
-            Console.WriteLine("reset2");
+            //Console.WriteLine("reset2");
             plateZ = 39800;
             /*while(!printer.LimitSwitchPressed())
             {
