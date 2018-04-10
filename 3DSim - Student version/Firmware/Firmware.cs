@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Hardware;
+using System.Diagnostics;
+
 namespace Firmware
 {
 
@@ -14,9 +16,19 @@ namespace Firmware
         string VersionNumber = "1.0";
         bool fDone = false;
         bool fInitialized = false;
+        double plateVelocity = 0;
+        double plateAccel = 0;
+        double plateZ = 0;
+        Stopwatch stopwatch = new Stopwatch();
+
+        byte[] TimeoutBytes = Encoding.ASCII.GetBytes("TIMEOUT");
+        byte[] ChecksumBytes = Encoding.ASCII.GetBytes("CHECKSUM");
+        byte[] SuccessBytes = Encoding.ASCII.GetBytes("SUCCESS");
+        byte[] VersionBytes;
 
         public FirmwareController(PrinterControl printer)
         {
+            VersionBytes = Encoding.ASCII.GetBytes("VERSION " + VersionNumber);
             this.printer = printer;
         }
 
@@ -44,9 +56,9 @@ namespace Firmware
 
                     if (data.Length == 0)
                     {
-                        byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
+                        //byte[] result = Encoding.ASCII.GetBytes("TIMEOUT");
                         //Console.WriteLine("Firmware - Sending Timeout");
-                        printer.WriteSerialToHost(result, result.Length);
+                        printer.WriteSerialToHost(TimeoutBytes, TimeoutBytes.Length);//(result, result.Length);
                         //Console.WriteLine("Firmware - Sent Timeout");
                         continue;
                     }
@@ -67,9 +79,9 @@ namespace Firmware
                     else
                     {
                         //Console.WriteLine("Firmware - Incorrect Checksum");
-                        byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
+                        //byte[] result = Encoding.ASCII.GetBytes("CHECKSUM");
                         //Console.WriteLine("Firmware - Sending CHECKSUM");
-                        printer.WriteSerialToHost(result, result.Length);
+                        printer.WriteSerialToHost(ChecksumBytes, ChecksumBytes.Length);//(result, result.Length);
                         //Console.WriteLine("Firmware - Sent CHECKSUM");
                     }
                 }
@@ -96,6 +108,12 @@ namespace Firmware
             else if(CmdByte == (byte)CommunicationCommand.RaiseBuildPlatform)
             {
                 //Console.WriteLine("F: Raise Build Platform");
+                /*int layers = BitConverter.ToInt32(Data, 0);
+                for (int i = 0; i < layers; i++)
+                {
+                    RaiseZRail();
+                }
+                SetLaser(BitConverter.ToBoolean(Data, 4));*/
                 RaiseZRail();
                 SetLaser(BitConverter.ToBoolean(Data, 0));
             }
@@ -120,13 +138,17 @@ namespace Firmware
             else if(CmdByte == (byte)CommunicationCommand.GetFirmwareVersion)
             {
                 //Console.WriteLine("F: GetFrimware");
-                return Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
+                return VersionBytes;//Encoding.ASCII.GetBytes("VERSION "+VersionNumber);
             }
             else if(CmdByte == (byte)CommunicationCommand.RemoveObject)
             {
                 //printer.RemoveModelFromPrinter();
             }
-            return Encoding.ASCII.GetBytes("SUCCESS");
+            else if(CmdByte == (byte)CommunicationCommand.ToBottom)
+            {
+                ZRailToBottom();
+            }
+            return SuccessBytes;//Encoding.ASCII.GetBytes("SUCCESS");
         }
 
         public void Start()
@@ -147,15 +169,50 @@ namespace Firmware
                 Thread.Sleep(500);
         }
 
+        public void accelPlate(PrinterControl.StepperDir dir)
+        {
+            double deltaT = (double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency;
+            double stepHeight = 0.0025;
+            //double deltaT = stopwatch.ElapsedMilliseconds;
+            if (plateVelocity < 2 && plateVelocity > -2)
+            {
+                plateVelocity = 2.0;
+            }
+            double targetTime = (stepHeight) / plateVelocity;
+            if (deltaT > targetTime)
+            {
+                stopwatch.Reset();
+                stopwatch.Start();
+                printer.StepStepper(dir);
+                plateZ -= 1;
+
+                plateVelocity += 3.9 * (deltaT);
+
+                if (plateVelocity > 39.0)
+                {
+                    plateVelocity = 39.0;
+                }
+
+            }
+        }
+
         public void ResetZRail()
         {
+            Console.WriteLine("reset");
+            stopwatch.Reset();
+            stopwatch.Start();
             while (!printer.LimitSwitchPressed())
             {
-                printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+                accelPlate(PrinterControl.StepperDir.STEP_UP);
             }
-            for (int i = 0; i < 39800; i++)
+            Console.WriteLine("reset2");
+            plateZ = 39800;
+            stopwatch.Reset();
+            stopwatch.Start();
+            plateVelocity = 0;
+            while (plateZ > 0)
             {
-                printer.StepStepper(PrinterControl.StepperDir.STEP_DOWN);
+                accelPlate(PrinterControl.StepperDir.STEP_DOWN);
             }
         }
 
@@ -177,9 +234,29 @@ namespace Firmware
 
         public void ZRailToTop()
         {
-            while(!printer.LimitSwitchPressed())
+            plateVelocity = 0;
+            stopwatch.Reset();
+            stopwatch.Start();
+            while (!printer.LimitSwitchPressed())
+            {
+                accelPlate(PrinterControl.StepperDir.STEP_UP);
+            }
+            Console.WriteLine("reset2");
+            plateZ = 39800;
+            /*while(!printer.LimitSwitchPressed())
             {
                 bool b = printer.StepStepper(PrinterControl.StepperDir.STEP_UP);
+            }*/
+        }
+
+        public void ZRailToBottom()
+        {
+            stopwatch.Reset();
+            stopwatch.Start();
+            plateVelocity = 0;
+            while (plateZ > 0)
+            {
+                accelPlate(PrinterControl.StepperDir.STEP_DOWN);
             }
         }
 

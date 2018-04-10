@@ -58,8 +58,11 @@ namespace PrinterSimulator
             return new Packet((byte)CommunicationCommand.ResetBuildPlatform, BitConverter.GetBytes(laserOnOff));
         }
 
-        public static Packet RaiseBuildPlatformCommand(bool laserOnOff)
+        public static Packet RaiseBuildPlatformCommand(bool laserOnOff)//int layers, bool laserOnOff)
         {
+            //byte[] bLayers = BitConverter.GetBytes(layers);
+            //byte[] bLaser = BitConverter.GetBytes(laserOnOff);
+            //return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, bLayers.Concat(bLaser).ToArray());
             return new Packet((byte)CommunicationCommand.RaiseBuildPlatform, BitConverter.GetBytes(laserOnOff));
         }
 
@@ -89,6 +92,11 @@ namespace PrinterSimulator
         public static Packet RemoveObject(bool laserOnOff)
         {
             return new Packet((byte)CommunicationCommand.RemoveObject, BitConverter.GetBytes(laserOnOff));
+        }
+
+        public static Packet ToBottom(bool laserOnOff)
+        {
+            return new Packet((byte)CommunicationCommand.ToBottom, BitConverter.GetBytes(laserOnOff));
         }
     }
 }

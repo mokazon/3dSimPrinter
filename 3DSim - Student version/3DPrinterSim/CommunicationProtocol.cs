@@ -13,24 +13,27 @@ namespace PrinterSimulator
             string stringResponse = "";
             while (stringResponse != "SUCCESS" && !stringResponse.Contains("VERSION"))
             {
+                //Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
+                //byte[] headerCopy = new byte[header.Length];
+                //header.CopyTo(headerCopy, 0);
                 byte[] header = pkt.GetHeaderBytes();
-                Console.WriteLine("Host - Sending header: " + header[0] + "," + header[1] + "," + header[2] + "," + header[3]);
                 pc.WriteSerialToFirmware(header, header.Length);
                 header = pkt.GetHeaderBytes();
                 byte[] headerCheck = ReadBlocking(pc, header.Length);
-                Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
-                if (headerCheck[0] == header[0] && headerCheck[1] == header[1] && headerCheck[2] == header[2] && headerCheck[3] == header[3])
+                //Console.WriteLine("Host - Received header: " + headerCheck[0] + "," + headerCheck[1] + "," + headerCheck[2] + "," + headerCheck[3]);
+                if (headerCheck.SequenceEqual(header))
                 {
-                    byte[] dataCopy = new byte[pkt.Length];
-                    pkt.Data.CopyTo(dataCopy, 0);
-                    Console.WriteLine("Host - Sending ACK");
-                    pc.WriteSerialToFirmware(new byte[] { 0xA5 }, 1);
-                    Console.WriteLine("Host - Sent ACK");
-                    Console.WriteLine("Host - Sending Data");
-                    foreach (byte x in pkt.Data) { Console.WriteLine("H: " + x); }
+                    byte[] dataCopy = new byte[pkt.Length+1];
+                    pkt.Data.CopyTo(dataCopy, 1);
+                    dataCopy[0] = 0xA5;
+                    //Console.WriteLine("Host - Sending ACK");
+                    //pc.WriteSerialToFirmware(new byte[] { 0xA5 }, 1);
+                    //Console.WriteLine("Host - Sent ACK");
+                    //Console.WriteLine("Host - Sending Data");
+                    //foreach (byte x in pkt.Data) { Console.WriteLine("H: " + x); }
                     pc.WriteSerialToFirmware(dataCopy, dataCopy.Length);
-                    Console.WriteLine("Host - Sent Data");
-                    Console.WriteLine("Host - Waiting for response");
+                    //Console.WriteLine("Host - Sent Data");
+                    //Console.WriteLine("Host - Waiting for response");
                     byte[] partialResponse = Read(pc, 1);
                     List<byte> response = new List<byte>();
                     while (partialResponse.Length == 0) { partialResponse = Read(pc, 1); }
@@ -40,24 +43,27 @@ namespace PrinterSimulator
                         {
                             response.Add(partialResponse[0]);
                         }
+                        else
+                        {
+                            stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
+                            if (stringResponse == "SUCCESS") { break; }
+                            else if (stringResponse.Contains("VERSION") && partialResponse.Length == 0) { break; }
+                            else if (stringResponse == "CHECKSUM") { break; }
+                            else if (stringResponse == "TIMEOUT") { break; }
+                        }
                         partialResponse = Read(pc, 1);
-                        stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
-                        if (stringResponse == "SUCCESS") { break; }
-                        else if (stringResponse.Contains("VERSION") && partialResponse.Length == 0) { break; }
-                        else if (stringResponse == "CHECKSUM") { break; }
-                        else if (stringResponse == "TIMEOUT") { break; }
 
                         //if (partialResponse.Length == 0) { break; }
                     }
                     stringResponse = ASCIIEncoding.ASCII.GetString(response.ToArray());
-                    Console.WriteLine("Host recieved response: "+stringResponse);
+                    //Console.WriteLine("Host recieved response: "+stringResponse);
                     continue;
                 }
                 else
                 {
-                    Console.WriteLine("Host - Sending NACK");
+                    //Console.WriteLine("Host - Sending NACK");
                     pc.WriteSerialToFirmware(new byte[] { 0xFF }, 1);
-                    Console.WriteLine("Host - SentNACK");
+                    //Console.WriteLine("Host - SentNACK");
                     stringResponse = "Invalid Header";
                 }
             }
@@ -127,6 +133,7 @@ namespace PrinterSimulator
         AimLaser = 4,
         GetFirmwareVersion = 5,
         LowerBuildPlatform = 6,
-        RemoveObject = 7
+        RemoveObject = 7,
+        ToBottom = 8
     }
 }
