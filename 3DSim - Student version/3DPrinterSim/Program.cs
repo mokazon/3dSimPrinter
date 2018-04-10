@@ -258,7 +258,7 @@ namespace PrinterSimulator
                                 }
                                 else
                                 {
-                                    Console.WriteLine("It did not work and it's Matthew's fault.");
+                                    Console.WriteLine("It did not work and it's potentially Jermaine's fault.");
                                 }
                                 Console.ReadLine();
                                 break;
@@ -304,10 +304,38 @@ namespace PrinterSimulator
                                 }
                                 Console.ReadLine();
                                 break;
-                            /*case 'A':
-                                Packet aimLaser = Packet.AimLaserCommand(); Takes coordinates. Need to figure out how to test.
+                            case 'A':
+                                Console.Write("Please input x coordinate: ");
+                                string xcoord = Console.ReadLine();
+                                Console.Write(float.Parse(xcoord));
+
+                                Console.Write("Please input y coordinate: ");
+                                string ycoord = Console.ReadLine();
+                                Packet resetplatform = Packet.ResetBuildPlatformCommand(false);
+                                string resetCommand = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetplatform);
+                                if (resetCommand == "SUCCESS")
+                                {
+                                    Console.WriteLine("It worked!");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("It did not work and it's never Jordan's fault.");
+                                }
+                                Console.ReadLine();
+
+                                Packet aimLaser = Packet.AimLaserCommand(float.Parse(xcoord), float.Parse(ycoord), true);
+                                string aimLaserResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), aimLaser);
+                                if (aimLaserResponse == "SUCCESS")
+                                {
+                                    Console.WriteLine("It worked!");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("It did not work and it's never Jordan's fault.");
+                                }
+                                Console.ReadLine();
                                 break;
-                             */
+                             
                             case 'V':
                                 Packet getVersion = Packet.GetFirmwareVersionCommand();
                                 string getVersionResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), getVersion);
