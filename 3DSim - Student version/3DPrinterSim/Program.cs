@@ -221,142 +221,151 @@ namespace PrinterSimulator
                         break;
 
                     case 'T': // Test menu
+                        bool done = false;
                         Console.Clear();
-                        Console.WriteLine("Welcome to the test menu!");
-                        Console.WriteLine("U - Step Up");
-                        Console.WriteLine("D - Step Down");
-                        Console.WriteLine("R - Reset Platform");
-                        Console.WriteLine("T - Platform to top");
-                        Console.WriteLine("L - Laser On/Off");
-                        Console.WriteLine("A - Aim laser test");
-                        Console.WriteLine("V - Get firmware version.");
-                        Console.WriteLine("O - Remove Object");
-                        char ch2 = Char.ToUpper(Console.ReadKey(true).KeyChar);
-                        switch (ch2)
+                        while (!done)
                         {
-                            case 'U':
-                                Packet upPacket = Packet.RaiseBuildPlatformCommand(false);
-                                string raiseResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), upPacket);
-                                if (raiseResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
+                            Console.WriteLine("Welcome to the test menu!");
+                            Console.WriteLine("U - Step Up");
+                            Console.WriteLine("D - Step Down");
+                            Console.WriteLine("R - Reset Platform");
+                            Console.WriteLine("T - Platform to top");
+                            Console.WriteLine("L - Laser On/Off");
+                            Console.WriteLine("A - Aim laser test");
+                            Console.WriteLine("V - Get firmware version.");
+                            Console.WriteLine("O - Remove Object");
+                            Console.WriteLine("B - Back");
+                            char ch2 = Char.ToUpper(Console.ReadKey(true).KeyChar);
+                            Console.Clear();
+                            switch (ch2)
+                            {
+                                case 'U':
+                                    Packet upPacket = Packet.RaiseBuildPlatformCommand(false);
+                                    string raiseResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), upPacket);
+                                    if (raiseResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
 
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's Matthew's fault.");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's Matthew's fault.");
 
-                                }
-                                break;
-                            case 'D':
-                                Packet downPacket = Packet.LowerBuildPlatformCommand(false);
-                                string lowerResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), downPacket);
-                                if (lowerResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's potentially Jermaine's fault.");
-                                }
-                                break;
+                                    }
+                                    break;
+                                case 'D':
+                                    Packet downPacket = Packet.LowerBuildPlatformCommand(false);
+                                    string lowerResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), downPacket);
+                                    if (lowerResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's potentially Jermaine's fault.");
+                                    }
+                                    break;
 
-                            case 'R':
-                                Packet resetPlatform = Packet.ResetBuildPlatformCommand(false);
-                                string resetPlatformResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPlatform);
-                                if (resetPlatformResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's John's fault.");
-                                }
-                                break;
+                                case 'R':
+                                    Packet resetPlatform = Packet.ResetBuildPlatformCommand(false);
+                                    string resetPlatformResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetPlatform);
+                                    if (resetPlatformResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's John's fault.");
+                                    }
+                                    break;
 
-                            case 'T':
-                                Packet toTopPlatform = Packet.ToTopCommand(false);
-                                string toTopResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), toTopPlatform);
-                                if (toTopResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's Kerstan's fault.");
-                                }
-                                break;
+                                case 'T':
+                                    Packet toTopPlatform = Packet.ToTopCommand(false);
+                                    string toTopResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), toTopPlatform);
+                                    if (toTopResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's Kerstan's fault.");
+                                    }
+                                    break;
 
-                            case 'L':
-                                Packet laserOnOff = Packet.LaserOnOffCommand(false);
-                                string laserCommandResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), laserOnOff);
-                                if (laserCommandResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's never Jordan's fault.");
-                                }
-                                break;
-                            case 'A':
-                                Console.Write("Please input x coordinate: ");
-                                string xcoord = Console.ReadLine();
+                                case 'L':
+                                    Packet laserOnOff = Packet.LaserOnOffCommand(false);
+                                    string laserCommandResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), laserOnOff);
+                                    if (laserCommandResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's never Jordan's fault.");
+                                    }
+                                    break;
+                                case 'A':
+                                    Console.Write("Please input x coordinate: ");
+                                    string xcoord = Console.ReadLine();
 
-                                Console.Write("Please input y coordinate: ");
-                                string ycoord = Console.ReadLine();
-                                Packet resetplatform = Packet.ResetBuildPlatformCommand(false);
-                                string resetCommand = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetplatform);
-                                if (resetCommand == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's never Jordan's fault.");
-                                }
-                                Console.ReadLine();
+                                    Console.Write("Please input y coordinate: ");
+                                    string ycoord = Console.ReadLine();
+                                    Packet resetplatform = Packet.ResetBuildPlatformCommand(false);
+                                    string resetCommand = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), resetplatform);
+                                    if (resetCommand == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's never Jordan's fault.");
+                                    }
+                                    Console.ReadLine();
 
-                                Packet aimLaser = Packet.AimLaserCommand(float.Parse(xcoord), float.Parse(ycoord), true);
-                                string aimLaserResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), aimLaser);
-                                if (aimLaserResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's never Jordan's fault.");
-                                }
-                                break;
-                             
-                            case 'V':
-                                Packet getVersion = Packet.GetFirmwareVersionCommand();
-                                string getVersionResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), getVersion);
-                                if (getVersionResponse.Contains("VERSION"))
-                                {
-                                    Console.WriteLine("It worked! " +getVersionResponse);
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and Jordan is still the best.");
-                                }
-                                break;
+                                    Packet aimLaser = Packet.AimLaserCommand(float.Parse(xcoord), float.Parse(ycoord), true);
+                                    string aimLaserResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), aimLaser);
+                                    if (aimLaserResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's never Jordan's fault.");
+                                    }
+                                    break;
 
-                            case 'O':
-                                Packet objectRemove = Packet.RemoveObject(false);
-                                string objectRemoveResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), objectRemove);
-                                if (objectRemoveResponse == "SUCCESS")
-                                {
-                                    Console.WriteLine("It worked!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("It did not work and it's Jermaine's fault.");
-                                }
-                                break;
+                                case 'V':
+                                    Packet getVersion = Packet.GetFirmwareVersionCommand();
+                                    string getVersionResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), getVersion);
+                                    if (getVersionResponse.Contains("VERSION"))
+                                    {
+                                        Console.WriteLine("It worked! " + getVersionResponse);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and Jordan is still the best.");
+                                    }
+                                    break;
 
+                                case 'O':
+                                    Packet objectRemove = Packet.RemoveObject(false);
+                                    string objectRemoveResponse = CommunicationProtocol.SendPacket(printer.GetPrinterSim(), objectRemove);
+                                    if (objectRemoveResponse == "SUCCESS")
+                                    {
+                                        Console.WriteLine("It worked!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("It did not work and it's Jermaine's fault.");
+                                    }
+                                    break;
+                                case 'B':
+                                    done = true;
+                                    break;
+
+
+                            }
                         }
-
                         break;
 
                     case 'R':
